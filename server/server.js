@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 app.use(morgan("dev"));
 
 app.use("/authenticate", require("./app/routes/authenticate")(express, pool, jwt, config.secret, bcrypt));
-app.use("/api", require("./app/routes/api")(express, pool, jwt, config.secret));
+app.use("/api", require("./app/routes/api")(express, pool, jwt, config.secret. bcrypt));
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, "/src/app/index.html")));
 
