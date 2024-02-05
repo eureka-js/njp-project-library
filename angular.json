@@ -63,10 +63,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "njp-project:build:production"
+              "buildTarget": "njp-project:build:production"
             },
             "development": {
-              "browserTarget": "njp-project:build:development"
+              "buildTarget": "njp-project:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -74,7 +74,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "njp-project:build"
+            "buildTarget": "njp-project:build"
           }
         },
         "test": {
