@@ -14,7 +14,7 @@ const pool = mysql.createPool(config.pool);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(express.static(__dirname, "/src"));
+app.use(express.static(path.join(__dirname, "../dist/njp-project")));
 
 app.use(helmet());
 
@@ -27,9 +27,9 @@ app.use((req, res, next) => {
 
 app.use(morgan("dev"));
 
-app.use("/authenticate", require("./app/routes/authenticate")(express, pool, jwt, config.secret, bcrypt));
-app.use("/api", require("./app/routes/api")(express, pool, jwt, config.secret. bcrypt));
+app.use("/authenticate", require("./app/routes/authenticate")(app, express, pool, jwt, config.secret, bcrypt));
+app.use("/api", require("./app/routes/api")(app, express, pool, jwt, config.secret. bcrypt));
 
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, "/src/app/index.html")));
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, "../dist/njp-project/index.html")));
 
 app.listen(config.port);

@@ -1,6 +1,6 @@
-module.exports = (express, pool, jwt, secret, bcrypt) => {
+module.exports = (app, express, pool, jwt, secret, bcrypt) => {
     const authRouter = express.Router();
-    
+
     authRouter.post('/', async (req, res) => {
         try {
             let conn = await pool.getConnection();

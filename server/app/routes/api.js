@@ -1,7 +1,7 @@
-modules.exports = (app, express, pool, jwt, secret, bcrypt) => {
+module.exports = (app, express, pool, jwt, secret, bcrypt) => {
     const apiRouter = express.Router();
 
-    apiRouter("/users").get(async (req, res) => {
+    apiRouter.route("/users").get(async (req, res) => {
         try {
             let conn = await pool.getConnection();
             res.json({
@@ -85,4 +85,6 @@ modules.exports = (app, express, pool, jwt, secret, bcrypt) => {
             });
         }
     });
+
+    return apiRouter;
 };
