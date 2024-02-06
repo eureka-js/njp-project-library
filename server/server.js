@@ -8,28 +8,32 @@ const helmet = require("helmet");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt-nodejs");
 const path = require("path");
-const pool = mysql.createPool(config.pool);
 
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+(async () => {
+     const pool = await mysql.createPool(config.pool);
 
-app.use(express.static(path.join(__dirname, "../dist/njp-project")));
+     app.use(bodyParser.urlencoded({ extended: true }));
+     app.use(bodyParser.json());
 
-app.use(helmet());
+     app.use(express.static(path.join(__dirname, "../dist/njp-project")));
 
-app.use((req, res, next) => {
-     res.setHeader("Access-Control-Allow-Origin", '*');
-     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-     res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type, \ Authorization");
-     next();
-});
+     app.use(helmet());
 
-app.use(morgan("dev"));
+     app.use((req, res, next) => {
+          res.setHeader("Access-Control-Allow-Origin", '*');
+          res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+          res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type, \ Authorization");
+          next();
+     });
 
-app.use("/authenticate", require("./app/routes/authenticate")(app, express, pool, jwt, config.secret, bcrypt));
-app.use("/api", require("./app/routes/api")(app, express, pool, jwt, config.secret. bcrypt));
+     app.use(morgan("dev"));
 
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, "../dist/njp-project/index.html")));
+     app.use("/authenticate", require("./app/routes/authenticate")(express, pool, jwt, config.secret, bcrypt));
+     app.use("/api", require("./app/routes/api")(express, pool, jwt, config.secret, bcrypt));
 
-app.listen(config.port);
+     app.get('*', (req, res) => res.sendFile(path.join(__dirname, "../dist/njp-project/index.html")));
+
+     app.listen(config.port);
+})();
+

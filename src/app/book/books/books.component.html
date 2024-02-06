@@ -1,2 +1,9 @@
-<p>books works!</p>
-<app-navbar></app-navbar>
+<app-header></app-header>
+<main [ngClass]="'container'">
+    <section [ngClass]="'row'">
+        <article *ngFor="let book in books">
+            
+        </article>
+    </section>
+</main>
+<app-footer></app-footer>

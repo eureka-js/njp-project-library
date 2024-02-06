@@ -1,0 +1,15 @@
+<app-header></app-header>
+<main [ngClass]="'container'">
+    <div [ngClass]="'row'">
+        <i>{{errMessage}}</i><br>
+        <form (submit)="onRegister()" [formGroup]="registerForm">
+            <input type="text" id="username" placeholder="Username" formControlName="username"><br>
+            <input type="password" id="pass0" placeholder="Password" formControlName="password"><br>
+            <input type="password" id="pass1" placeholder="Repeat password" formControlName="passRepeat"><br>
+            <input type="text" id="name" placeholder="Name" formControlName="name"><br>
+            <input type="email" id="email" placeholder="E-mail" formControlName="email"><br>
+            <button ng-click="onRegister()" [disabled]="registerForm.invalid">Register!</button><br>
+        </form>
+    </div>
+</main>
+<app-footer></app-footer>

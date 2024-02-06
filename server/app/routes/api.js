@@ -1,4 +1,4 @@
-module.exports = (app, express, pool, jwt, secret, bcrypt) => {
+module.exports = (express, pool, jwt, secret, bcrypt) => {
     const apiRouter = express.Router();
 
     apiRouter.route("/users").get(async (req, res) => {
@@ -63,6 +63,7 @@ module.exports = (app, express, pool, jwt, secret, bcrypt) => {
         }
     });
 
+
     apiRouter.use((req, res, next) => {
         // req.body.token || req.params.token || req.headers['x-access-token'] || req.query.token
         let token = req.headers["x-access-token"];
@@ -85,6 +86,8 @@ module.exports = (app, express, pool, jwt, secret, bcrypt) => {
             });
         }
     });
+
+    apiRouter.get("/me", (req, res) => res.send({ status: "OK", user: req.decoded }));
 
     return apiRouter;
 };

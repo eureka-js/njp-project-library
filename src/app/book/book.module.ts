@@ -13,8 +13,8 @@ import { BookRoutingModule } from './book-routing.module';
   ],
   imports: [
     CommonModule,
-    BookRoutingModule,
-    SharedModule
+    SharedModule,
+    BookRoutingModule
   ]
 })
 export class BookModule { }

@@ -1,9 +1,10 @@
-module.exports = (app, express, pool, jwt, secret, bcrypt) => {
+module.exports = (express, pool, jwt, secret, bcrypt) => {
     const authRouter = express.Router();
 
     authRouter.post('/', async (req, res) => {
+        let conn;
         try {
-            let conn = await pool.getConnection();
+            conn = await pool.getConnection();
 
             let userList = await conn.query("SELECT * FROM Users WHERE username = ?;", req.body.username);
             if (userList.length == 0) {

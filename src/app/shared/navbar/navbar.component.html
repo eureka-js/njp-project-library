@@ -1,1 +1,9 @@
-<p>navbar works!</p>
+<nav [ngClass]="'container'">
+    <div [ngClass]="'row'">
+        <div [ngClass]="'col-12'">
+            <a [routerLink]="['/']">Home</a>
+            <a [routerLink]="['/login']">Login</a>
+            <a [routerLink]="['/register']">Register</a>
+        </div>
+    </div>
+</nav>

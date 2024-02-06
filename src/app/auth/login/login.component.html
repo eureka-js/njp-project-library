@@ -1,0 +1,12 @@
+<app-header></app-header>
+<main [ngClass]="'container'">
+    <div [ngClass]="'row'">
+        <i>{{errMessage}}</i><br>
+        <form (submit)="onLogin()" [formGroup]="loginForm">
+            <input type="text" name="username" placeholder="Username" formControlName="username"><br>
+            <input type="password" name="password" placeholder="Password" formControlName="password"><br>
+            <button type="submit" [disabled]="loginForm.invalid">Login</button>
+        </form>
+    </div>
+</main>
+<app-footer></app-footer>
