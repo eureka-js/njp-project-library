@@ -1,8 +1,12 @@
-<app-header></app-header>
+<app-main-header></app-main-header>
 <main [ngClass]="'container'">
     <section [ngClass]="'row'">
-        <article *ngFor="let book in books">
-            
+        <article *ngFor="let book of books">
+            <div [ngClass]="'col-6'">
+                <p>Title: {{book.title}}</p>
+                <p>Genre: {{book.genre.type}}</p>
+                <p>Author: {{book.author.name}} {{book.author.surname}}</p>
+            </div>
         </article>
     </section>
 </main>

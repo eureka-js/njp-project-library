@@ -4,12 +4,16 @@ import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
+import { MainNavbarComponent } from './main-navbar/main-navbar.component';
+import { MainHeaderComponent } from './main-header/main-header.component';
 
 
 
 @NgModule({
   declarations: [
     NavbarComponent,
+    MainNavbarComponent,
+    MainHeaderComponent,
     HeaderComponent,
     FooterComponent
   ],
@@ -20,7 +24,9 @@ import { FooterComponent } from './footer/footer.component';
   exports: [
     CommonModule,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    MainNavbarComponent,
+    MainHeaderComponent
   ]
 })
 export class SharedModule { }

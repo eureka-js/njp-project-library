@@ -1,0 +1,14 @@
+<app-main-header></app-main-header>
+<main [ngClass]="'container'">
+    <div [ngClass]="'row'">
+        <i>{{message}}</i><br>
+        <form (submit)="onDonate()" [formGroup]="donateForm">
+            <input type="text" id="title" placeholder="Title" formControlName="title"><br>
+            <input type="text" id="genreType" placeholder="Genre type" formControlName="genreType"><br>
+            <input type="text" id="authorName" placeholder="Author's name" formControlName="authorName"><br>
+            <input type="text" id="authorSurname" placeholder="Author's surname" formControlName="authorSurname"><br>
+            <button ng-click="onDonate()" [disabled]="donateForm.invalid">Donate</button><br>
+        </form>
+    </div>
+</main>
+<app-footer></app-footer>

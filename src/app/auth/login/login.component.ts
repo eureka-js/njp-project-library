@@ -8,13 +8,13 @@ import { AuthService } from 'src/app/shared/services/auth.service';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  errMessage: string = "";
+  message: string = "";
   loginForm!: FormGroup;
 
-  constructor(private auth: AuthService) {};
+  constructor(private authService: AuthService) {};
 
   ngOnInit() {
-    this.auth.errEmmitter.subscribe((err: string) => this.errMessage = err);
+    this.authService.errEmmitter.subscribe((err: string) => this.message = err);
 
     this.loginForm = new FormGroup({
       "username": new FormControl(null, [Validators.required]),
@@ -23,6 +23,6 @@ export class LoginComponent {
   }
 
   onLogin() {
-    this.auth.login(this.loginForm.value);
+    this.authService.login(this.loginForm.value);
   }
 }

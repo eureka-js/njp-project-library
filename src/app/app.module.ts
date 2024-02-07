@@ -10,7 +10,8 @@ import { BookModule } from './book/book.module';
 import { AuthModule } from './auth/auth.module';
 import { RegisterModule } from './register/register.module';
 import { AuthService } from './shared/services/auth.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './auth/auth.interceptor';
 
 
 @NgModule({
@@ -25,7 +26,7 @@ import { HttpClientModule } from '@angular/common/http';
     AuthModule,
     RegisterModule
   ],
-  providers: [AuthService],
+  providers: [AuthService, {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

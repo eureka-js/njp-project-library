@@ -8,9 +8,10 @@ import { authGuard } from './shared/auth.guard';
 
 
 const routes: Routes = [
+  {path: '', loadChildren: () => BookModule, canActivate: [authGuard]},
   {path: 'login', loadChildren: () => AuthModule},
   {path: 'register', loadChildren: () => RegisterModule},
-  {path: '**', loadChildren: () => BookModule},
+  {path: '**', redirectTo: ''},
 ];
 
 @NgModule({

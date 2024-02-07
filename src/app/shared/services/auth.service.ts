@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { environment } from '../environment';
-import { Observable, Subject } from "rxjs";
-import { map } from "rxjs/operators";
-import { HttpClient } from "@angular/common/http";
+import { Observable, Subject, throwError } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { User } from "../models/user.model";
 
@@ -13,7 +13,7 @@ export class AuthService {
     private token?: string;
     errEmmitter: Subject<string> = new Subject<string>();
     authChange: Subject<boolean> = new Subject<boolean>();
-    authUrl: string = environment.API_URL + "/authenticate";
+    private authUrl: string = environment.API_URL + "/authenticate";
 
     constructor(private http: HttpClient, private router: Router) {};
 
@@ -25,7 +25,7 @@ export class AuthService {
                         localStorage.setItem("token", this.token || "");
                         this.user = res.user;
                         this.authChange.next(true);
-        
+
                         this.router.navigate(['/']);
                     } else {
                         this.errEmmitter.next(res.description);
@@ -61,7 +61,9 @@ export class AuthService {
     whoAmI() {
         if (this.getToken()) {
             return this.http.get(environment.API_URL + "/api/me").pipe(map((res: any) => {
-                if (res.status == "OK") {
+                if (res.status == "NOT OK" && res.description == "Token expired") {
+                    this.logout();
+                } else if (res.status == "OK") {
                     this.user = res.user;
                     this.authChange.next(true);
                 }
@@ -72,4 +74,4 @@ export class AuthService {
             return new Observable(observer => observer.next({ status: "NOT OK" }));
         }
     }
-}
+};

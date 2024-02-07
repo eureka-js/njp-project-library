@@ -6,10 +6,10 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         try {
             conn = await pool.getConnection();
 
-            let userList = await conn.query("SELECT * FROM Users WHERE username = ?;", req.body.username);
+            let userList = await conn.query("SELECT * FROM Users WHERE username = ?;", [req.body.username]);
             if (userList.length == 0) {
                 res.json({ "status": "NOT OK", "description": "Username doesn't exist"});
-            } else if (bcrypt.compareSync(req.body.credentials.password, userList[0].password)) {
+            } else if (bcrypt.compareSync(req.body.password, userList[0].password)) {
                 let membList = await conn.query(
                     "SELECT idMemberShipType FROM Memberships WHERE idUser = ?;",
                      userList[0].id
@@ -27,8 +27,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                             email: userList[0].email,
                             membType: (await conn.query(
                                 "SELECT type FROM MembershipTypes WHERE id = ?;",
-                                membList[0].idMembershipType
-                            )),
+                                [membList[0].idMembershipType]))[0],
                         }, secret, { expiresIn: 1440 })
                     });
                 }
