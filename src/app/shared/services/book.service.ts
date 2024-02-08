@@ -26,10 +26,22 @@ export class BookService {
     
     addBook(book: Book) {
         this.dataService.addBook(book)
-        .pipe(catchError((err) => { return throwError(() => new TypeError(err)); }))
-        .subscribe(() => {
-            this.books.push(book);
-            this.booksSubject.next([...this.books]);
+            .pipe(catchError((err) => { return throwError(() => new TypeError(err)) }))
+            .subscribe(() => {
+                this.books.push(book);
+                this.booksSubject.next([...this.books]);
+            });
+    }
+
+    delBookById(id: number) {
+        this.dataService.delBookById(id).subscribe((res: any) => {
+            if (res.status === "OK") {
+                let bookIndex = this.books.findIndex(b => b.id === id);
+                if (bookIndex !== -1) {
+                    this.books.splice(bookIndex, 1)
+                    this.booksSubject.next([...this.books]);
+                }
+            }
         });
     }
 };

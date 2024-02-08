@@ -8,7 +8,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             res.json({
                 status: "OK",
                 users: await conn.query(
-                    `SELECT u.*, mt.type
+                    `SELECT u.id, u.username, u.name, u.surname, u.email, mt.type AS memType
                     FROM Users AS u INNER JOIN
                         Memberships AS m ON u.id = m.idUser INNER JOIN
                         MembershipTypes AS mt ON m.idMembershipType = mt.id;`
@@ -39,8 +39,8 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
 
                 res.json({
                     "status": "OK",
-                    insertId: insertId,
-                    memType: memType[0].type
+                    "insertId": insertId,
+                    "memType": memType[0].type
                 });
             }); 
         } catch (err) {
@@ -53,16 +53,41 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         }
     });
 
-    apiRouter.route("/users/username").get(async (req, res) => {
+    apiRouter.use((req, res, next) => {
+        // req.body.token || req.params.token || req.headers['x-access-token'] || req.query.token
+        let token = req.headers.authorization;
+        if (token) {
+            jwt.verify(token, secret, (err, decoded) => {
+                if (err) {
+                    if (err.name === "TokenExpiredError") {
+                        res.json({ "status": "NOT OK", "description": "Token expired" });
+                    } else {
+                        res.status(403).send({
+                            "success": false,
+                            "message": "Token error"
+                        });
+                    }
+                } else {
+                    req.decoded = decoded;
+                    next();
+                }
+            });
+        } else {
+            res.status(403).send({
+                "success": false,
+                "message": "No token"
+            });
+        }
+    });
+
+    apiRouter.route("/user/:id").delete(async (req, res) => {
         let conn;
         try {
             conn = await pool.getConnection();
-            if ((await conn.query(
-                "SELECT * FROM Users WHERE username = ?;", req.params.username)).length === 0) {
-                res.json({ "status": "OK" });
-            } else {
-                res.json({ "status": "NOT OK" });
-            }
+            await conn.query("DELETE FROM Memberships WHERE idUser = ?;", [req.params.id]);
+            await conn.query("DELETE FROM Users WHERE id = ?;", [req.params.id]);
+
+            res.json({ "status": "OK" });
         } catch (err) {
             console.log(err);
             res.json({ "status": "NOT OK" });
@@ -74,30 +99,30 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
     });
 
 
-    apiRouter.use((req, res, next) => {
-        // req.body.token || req.params.token || req.headers['x-access-token'] || req.query.token
-        let token = req.headers.authorization;
-        if (token) {
-            jwt.verify(token, secret, (err, decoded) => {
-                if (err) {
-                    if (err.name === "TokenExpiredError") {
-                        res.json({ "status": "NOT OK", "description": "Token expired" });
-                    } else {
-                        res.status(403).send({
-                            success: false,
-                            message: "Token error"
-                        });
-                    }
-                } else {
-                    req.decoded = decoded;
-                    next();
-                }
+    apiRouter.route("/userMemType/:id").put(async (req, res) => {
+        let conn;
+        try {
+            conn = await pool.getConnection();
+            let memType = (await conn.query(
+                "SELECT * FROM MembershipTypes WHERE type <> ?;",
+                [req.body.memType]
+            ))[0];
+            await conn.query(
+                "UPDATE Memberships SET idMembershipType = ? WHERE idUser = ?;",
+                [memType.id, req.params.id]
+            );
+
+            res.json({
+                "status": "OK",
+                "memType": memType.type
             });
-        } else {
-            res.status(403).send({
-                success: false,
-                message: "No token"
-            });
+        } catch (err) {
+            console.log(err);
+            res.json({ "status": "NOT OK" });
+        } finally {
+            if (conn) {
+                conn.release();
+            }
         }
     });
 
@@ -106,7 +131,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         try {
             conn = await pool.getConnection();
             let books = await conn.query(
-                `SELECT b.*, g.*, a.* 
+                `SELECT b.*, g.type, a.name, a.surname 
                 FROM Books AS b INNER JOIN
                     Genres AS g ON b.idGenre = g.id INNER JOIN
                     Authors AS a ON b.idAuthor = a.id;`
@@ -114,7 +139,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
 
             res.json({
                 "status": "OK",
-                books: books
+                "books": books
             });
         } catch (err) {
             console.log(err);
@@ -129,38 +154,38 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         try {
             conn = await pool.getConnection();
             
-            let insertGenreId = (await conn.query(
-                "SELECT id FROM Genres WHERE type = ?;",
+            let genreInsertId = (await conn.query(
+                "SELECT id AS insertId FROM Genres WHERE type = ?;",
                 [req.body.genreType]
-            ))[0].id;
-            if (!insertGenreId) {
-                insertGenreId = (await conn.query(
+            ));
+            if (genreInsertId.length === 0) {
+                genreInsertId = [{ insertId: (await conn.query(
                     "INSERT INTO Genres(type) VALUES(?);",
                     [req.body.genreType]
-                )).insertId;
+                )).insertId }];
             }
 
-            let insertAuthorId = (await conn.query(
-                "SELECT id FROM Authors WHERE name = ? AND surname = ?;",
+            let authorInsertId = (await conn.query(
+                "SELECT id AS insertId FROM Authors WHERE name = ? AND surname = ?;",
                 [req.body.authorName, req.body.authorSurname]
-            ))[0].id;
-            if (!insertAuthorId) {
-                insertAuthorId = (await conn.query(
+            ));
+            if (authorInsertId.length === 0) {
+                authorInsertId = [{ insertId: (await conn.query(
                     "INSERT INTO Authors(name, surname) VALUES(?, ?);",
                     [req.body.authorName, req.body.authorSurname]
-                )).insertId;
+                )).insertId }];
             }
 
             let insertBookId = (await conn.query(
                 "INSERT INTO Books(idGenre, idAuthor, title) VALUES(?, ?, ?);",
-                [insertGenreId, insertAuthorId, req.body.bookTitle]
+                [genreInsertId[0].insertId, authorInsertId[0].insertId, req.body.bookTitle]
             )).insertId;
 
             res.json({
                 "status": "OK",
-                insertBookId: insertBookId,
-                insertGenreId: insertGenreId,
-                insertAuthorId: insertAuthorId
+                "insertBookId": insertBookId,
+                "insertGenreId": genreInsertId,
+                "insertAuthorId": authorInsertId
             });
         } catch (err) {
             console.log(err);
@@ -172,7 +197,35 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         }
     });
 
-    apiRouter.get("/me", (req, res) => res.send({ status: "OK", user: req.decoded }));
+    apiRouter.route("/book/:id").delete(async (req, res) => {
+        let conn;
+        try {
+            conn = await pool.getConnection();
+            let idsList = await conn.query("SELECT idGenre, idAuthor FROM Books WHERE id = ?;", [req.params.id]);
+            if (idsList.length > 0) {
+                await conn.query("DELETE FROM Books WHERE id = ?;", [req.params.id]);
+                if ((await conn.query("SELECT COUNT(*) FROM Books WHERE idGenre = ?;", [idsList[0].idGenre]))[0]['COUNT(*)'] ==  0) {
+                    await conn.query("DELETE FROM Genres WHERE id = ?", [idsList[0].idGenre]);
+                }
+                if ((await conn.query("SELECT COUNT(*) FROM Books WHERE idAuthor = ?;", [idsList[0].idAuthor]))[0]['COUNT(*)'] == 0) {
+                    await conn.query("DELETE FROM Authors WHERE id = ?", [idsList[0].idAuthor]);
+                }
+            } else {
+                res.json({ "status": "OK", "description": "Book not found"});
+            }
+
+            res.json({ "status": "OK"});
+        } catch (err) {
+            console.log(err);
+            res.json({ "status": "NOT OK" });
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    });
+
+    apiRouter.get("/me", (req, res) => res.send({ "status": "OK", "user": req.decoded }));
 
     return apiRouter;
 };

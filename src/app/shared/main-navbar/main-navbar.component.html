@@ -3,7 +3,8 @@
         <div [ngClass]="'col-12'">
             <a [routerLink]="['/']">Lend</a>
             <a [routerLink]="['/donate']">Donate</a>
-            <a [routerLink]="['/login']">Logout</a>
+            <a *ngIf="isUserAdmin" [routerLink]="['/admin']">Admin</a>
+            <a (click)="onLogout()">Logout</a>
         </div>
     </div>
 </nav>

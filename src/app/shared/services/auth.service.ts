@@ -1,18 +1,20 @@
 import { Injectable } from "@angular/core";
 import { environment } from '../environment';
-import { Observable, Subject, throwError } from "rxjs";
-import { catchError, map } from "rxjs/operators";
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { Observable, Subject } from "rxjs";
+import { map } from "rxjs/operators";
+import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { User } from "../models/user.model";
 
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class AuthService {
     private user?: User;
+    private isUserAdminSubject: Subject<boolean> = new Subject<boolean>();
     private token?: string;
     errEmmitter: Subject<string> = new Subject<string>();
-    authChange: Subject<boolean> = new Subject<boolean>();
     private authUrl: string = environment.API_URL + "/authenticate";
 
     constructor(private http: HttpClient, private router: Router) {};
@@ -23,8 +25,15 @@ export class AuthService {
                     if (res.status === "OK") {
                         this.token = res.token;
                         localStorage.setItem("token", this.token || "");
-                        this.user = res.user;
-                        this.authChange.next(true);
+                        this.user = new User(
+                            res.user.id,
+                            res.user.username,
+                            res.user.name,
+                            res.user.surname,
+                            res.user.email,
+                            res.user.memType
+                        );
+                        this.isUserAdminSubject.next(this.user.memType === "admin");
 
                         this.router.navigate(['/']);
                     } else {
@@ -37,13 +46,20 @@ export class AuthService {
         this.user = undefined;
         this.token = undefined;
         localStorage.removeItem("token");
-        this.authChange.next(false);
 
         this.router.navigate(['login']);
     }
 
     getUser() {
         return this.user;
+    }
+
+    getIsUserAdminSubject() {
+        return this.isUserAdminSubject;
+    }
+
+    isUserAdmin() {
+        return this.user?.memType === "admin";
     }
 
     getToken() {
@@ -65,7 +81,7 @@ export class AuthService {
                     this.logout();
                 } else if (res.status == "OK") {
                     this.user = res.user;
-                    this.authChange.next(true);
+                    this.isUserAdminSubject.next(this.user?.memType === "admin");
                 }
 
                 return res;

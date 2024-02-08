@@ -1,0 +1,14 @@
+<app-admin-header></app-admin-header>
+<main [ngClass]="'container'">
+    <section [ngClass]="'row'">
+        <article *ngFor="let book of books">
+            <div [ngClass]="'col-6'">
+                <p>Title: {{book.title}}</p>
+                <p>Genre: {{book.genre.type}}</p>
+                <p>Author: {{book.author.name}} {{book.author.surname}}</p>
+                <button (click)="onRemove(book.id)">Remove</button>
+            </div>
+        </article>
+    </section>
+</main>
+<app-footer></app-footer>

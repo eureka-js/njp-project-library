@@ -33,7 +33,17 @@ export class RegisterComponent {
               throw new TypeError("E-mail format is invalid");
           }
 
-          this.userService.addUser(this.registerForm.value);
+          this.userService.addUser(
+            new User(
+              -1,
+              this.registerForm.value.username,
+              this.registerForm.value.name,
+              this.registerForm.value.surname,
+              this.registerForm.value.email,
+              ""
+            ), 
+            this.registerForm.value.password
+          );
           this.message = "Register successful"
       } catch(e) {
           if (e instanceof TypeError) {

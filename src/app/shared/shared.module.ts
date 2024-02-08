@@ -6,12 +6,16 @@ import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { MainNavbarComponent } from './main-navbar/main-navbar.component';
 import { MainHeaderComponent } from './main-header/main-header.component';
+import { AdminNavbarComponent } from './admin-navbar/admin-navbar.component';
+import { AdminHeaderComponent } from './admin-header/admin-header.component';
 
 
 
 @NgModule({
   declarations: [
     NavbarComponent,
+    AdminNavbarComponent,
+    AdminHeaderComponent,
     MainNavbarComponent,
     MainHeaderComponent,
     HeaderComponent,
@@ -23,10 +27,12 @@ import { MainHeaderComponent } from './main-header/main-header.component';
   ],
   exports: [
     CommonModule,
+    AdminNavbarComponent,
+    AdminHeaderComponent,
     HeaderComponent,
     FooterComponent,
     MainNavbarComponent,
     MainHeaderComponent
-  ]
+]
 })
 export class SharedModule { }

@@ -20,33 +20,40 @@ export class DataService {
     getUsers() {
         return this.httpClient.get(this.apiUrl + "/users").pipe(map((res: any) => {
             const users: User[] = [];
-            for (let key in res) {
-                users.push({id: key, ...res[key as keyof typeof res]} as User);
+            for (let key in res.users) {
+                users.push({id: key, ...res.users[key as keyof typeof res.users]} as User);
             }
 
             return users;
         }));
     }
 
-    addUser(userInf: {username: string, password: string, passRepeat: string, name: string, surname: string, email: string}) {
+    addUser(user: User, pass: string) {
         return this.httpClient.post(this.apiUrl + "/users", { 
-            username: userInf.username,
-            password: userInf.password,
-            name: userInf.name,
-            surname: userInf.surname,
-            email: userInf.email 
+            username: user.username,
+            password: pass,
+            name: user.name,
+            surname: user.surname,
+            email: user.email 
         }).pipe((res: any) => {
             if (res.status === "NOT OK") {
                 return throwError(() => new TypeError(res.description));
             }
 
-            let tmpUser: User = new User(-1, userInf.username, userInf.name, userInf.surname, userInf.email, "");
-            tmpUser.id = res.insertedId;
-            tmpUser.memType = res.memType;
+            user.id = res.insertId;
+            user.memType = res.memType;
 
             return res;
         });
     }
+
+    changeMemTypeById(id: number, memType: string) {
+        return this.httpClient.put(this.apiUrl + "/userMemType/" + id, { memType: memType});
+    }
+
+    delUserById(id: number) {
+        return this.httpClient.delete(this.apiUrl + "/user/" + id);
+    };
 
     getBooks() {
         return this.httpClient.get(this.apiUrl + "/books").pipe(map((res: any) => {
@@ -60,7 +67,6 @@ export class DataService {
     }
 
     addBook(book: Book) {
-        console.log("Book: ", book);
         return this.httpClient.post(this.apiUrl + "/books", { 
             bookTitle: book.title,
             genreType: book.genre.type,
@@ -77,5 +83,9 @@ export class DataService {
 
             return res;
         });
+    }
+
+    delBookById(id: number) {
+        return this.httpClient.delete(this.apiUrl + "/book/" + id);
     }
 };

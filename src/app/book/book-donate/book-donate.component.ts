@@ -26,7 +26,6 @@ export class BookDonateComponent {
   }
 
   onDonate() {
-    console.log("donateForm: ", this.donateForm.value);
     try {
       this.bookService.addBook(new Book(
         -1,

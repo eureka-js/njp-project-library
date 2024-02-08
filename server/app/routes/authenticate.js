@@ -10,25 +10,27 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             if (userList.length == 0) {
                 res.json({ "status": "NOT OK", "description": "Username doesn't exist"});
             } else if (bcrypt.compareSync(req.body.password, userList[0].password)) {
-                let membList = await conn.query(
-                    "SELECT idMemberShipType FROM Memberships WHERE idUser = ?;",
+                let idMembTypeList = await conn.query(
+                    "SELECT idMembershipType FROM Memberships WHERE idUser = ?;",
                      userList[0].id
                 );
-                if (membList.length == 0) {
+                if (idMembTypeList.length == 0) {
                     res.json({ "status": "NOT OK", "description": "Membership non existant"});
                 } else {
+                    let user = {
+                        id: userList[0].id,
+                        username: userList[0].username,
+                        name: userList[0].name,
+                        surname: userList[0].surname,
+                        email: userList[0].email,
+                        memType: (await conn.query(
+                            "SELECT type FROM MembershipTypes WHERE id = ?;",
+                            [idMembTypeList[0].idMembershipType]))[0].type,
+                    }
                     res.json({
                         "status": "OK",
-                        "token": jwt.sign({
-                            id: userList[0].id,
-                            username: userList[0].username,
-                            name: userList[0].name,
-                            surname: userList[0].surname,
-                            email: userList[0].email,
-                            membType: (await conn.query(
-                                "SELECT type FROM MembershipTypes WHERE id = ?;",
-                                [membList[0].idMembershipType]))[0],
-                        }, secret, { expiresIn: 1440 })
+                        "token": jwt.sign(user, secret, { expiresIn: 1440 }),
+                        "user": user
                     });
                 }
             } else {
