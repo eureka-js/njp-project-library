@@ -1,5 +1,6 @@
 module.exports = (express, pool, jwt, secret, bcrypt) => {
     const apiRouter = express.Router();
+    const dateFormat = "%d/%m/%Y";
 
     apiRouter.route("/users").get(async (req, res) => {
         let conn;
@@ -28,7 +29,10 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             conn = await pool.getConnection();
             
             if ((await conn.query("SELECT id FROM Users WHERE username = ?", [req.body.username])).length > 0) {
-                return res.json({ "status": "NOT OK", "description": "Username is already taken" });
+                return res.json({
+                    "status": "NOT OK",
+                    "description": "Username is already taken"
+                });
             }
 
             bcrypt.hash(req.body.password, null, null, async (err, hash) => {
@@ -131,10 +135,21 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         try {
             conn = await pool.getConnection();
             let books = await conn.query(
-                `SELECT b.*, g.type, a.name, a.surname 
-                FROM Books AS b INNER JOIN
-                    Genres AS g ON b.idGenre = g.id INNER JOIN
-                    Authors AS a ON b.idAuthor = a.id;`
+                `SELECT b.*,
+                    g.type AS genreType,
+                    a.name, a.surname,
+                    c.id AS idCheckout, c.idMembership, c.idCheckoutDate,
+                    DATE_FORMAT(cd.checkoutDate, "${dateFormat}") AS checkoutDate,
+                        DATE_FORMAT(cd.returnDate, "${dateFormat}") AS returnDate,
+                    m.idMembershipType, m.idUser,
+                    mt.type AS memType
+                FROM Books AS b LEFT JOIN
+                    Genres AS g ON b.idGenre = g.id LEFT JOIN
+                    Authors AS a ON b.idAuthor = a.id LEFT JOIN
+                    Checkouts AS c ON b.id = c.idBook LEFT JOIN
+                    CheckoutDates AS cd ON c.idCheckoutDate = cd.id LEFT JOIN
+                    Memberships AS m ON c.idMembership = m.id LEFT JOIN
+                    MembershipTypes AS mt ON m.idMembershipType = mt.id;`
             );
 
             res.json({
@@ -165,10 +180,10 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 )).insertId }];
             }
 
-            let authorInsertId = (await conn.query(
+            let authorInsertId = await conn.query(
                 "SELECT id AS insertId FROM Authors WHERE name = ? AND surname = ?;",
                 [req.body.authorName, req.body.authorSurname]
-            ));
+            );
             if (authorInsertId.length === 0) {
                 authorInsertId = [{ insertId: (await conn.query(
                     "INSERT INTO Authors(name, surname) VALUES(?, ?);",
@@ -211,13 +226,106 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                     await conn.query("DELETE FROM Authors WHERE id = ?", [idsList[0].idAuthor]);
                 }
             } else {
-                res.json({ "status": "OK", "description": "Book not found"});
+                res.json({ 
+                    "status": "OK",
+                    "description": "Book not found"
+                });
             }
 
             res.json({ "status": "OK"});
         } catch (err) {
             console.log(err);
             res.json({ "status": "NOT OK" });
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    });
+
+    apiRouter.route("/bookLend").put(async (req, res) => {
+        let conn;
+        try {
+            conn = await pool.getConnection();
+
+            if ((await conn.query("SELECT id FROM Checkouts WHERE idBook = ?;", [req.body.bookId])).length > 0) {
+                return res.json({
+                    "status": "NOT OK",
+                    "description": "Book is already lent"
+                });
+            }
+
+            let checkoutDate = new Date();
+            let returnDate = (new Date(checkoutDate));
+            returnDate.setMonth(returnDate.getMonth() + 1);
+            checkoutDate = checkoutDate.toLocaleString(undefined, { year: "numeric", month: "numeric", day: "numeric"});
+            returnDate = returnDate.toLocaleString(undefined, { year: "numeric", month: "numeric", day: "numeric"});
+            let chDateInsertId = await conn.query(
+                `SELECT id AS insertId
+                FROM CheckoutDates
+                WHERE checkoutDate = STR_TO_DATE(?, "${dateFormat}") AND returnDate = STR_TO_DATE(?, "${dateFormat}");`,
+                [checkoutDate, returnDate]
+            );
+            if (chDateInsertId.length === 0) {
+                chDateInsertId = [{ insertId: (await conn.query(
+                    `INSERT INTO CheckoutDates(checkoutDate, returnDate)
+                    VALUES(STR_TO_DATE(?, "${dateFormat}"), STR_TO_DATE(?, "${dateFormat}"));`,
+                    [checkoutDate, returnDate]
+                )).insertId}];
+            }
+
+            await conn.query(
+                `INSERT INTO Checkouts(idMembership, idBook, idCheckoutDate)
+                VALUES(
+                    (SELECT id FROM Memberships WHERE idUser = ? LIMIT 1),
+                    ?, ?
+                );`,
+                [req.body.userId, req.body.bookId, chDateInsertId[0].insertId]
+            );
+
+
+            res.json({
+                "status": "OK",
+                "checkout": (await conn.query(
+                    `SELECT c.id AS idCheckout, c.idMembership, c.idCheckoutDate,
+                        DATE_FORMAT(cd.checkoutDate, "${dateFormat}") AS checkoutDate,
+                            DATE_FORMAT(cd.returnDate, "${dateFormat}") AS returnDate,
+                        m.idMembershipType, m.idUser
+                    FROM Checkouts AS c INNER JOIN
+                        CheckoutDates AS cd ON c.idCheckoutDate = cd.id INNER JOIN
+                        Memberships AS m ON c.idMembership = m.id
+                    WHERE c.idBook = ?;`,
+                    [req.body.bookId]
+                ))[0]
+            });
+        } catch (err) {
+            console.log(err);
+            res.json({ "status": "NOT OK"});
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    });
+
+    apiRouter.route("/bookCheckout/:id").delete(async (req, res) => {
+        let conn;
+        try {
+            conn = await pool.getConnection();
+
+            let chDateId = (await conn.query("SELECT idCheckoutDate FROM Checkouts WHERE idBook = ?;", [req.params.id]))[0].idCheckoutDate;
+            if (chDateId) {
+                await conn.query("DELETE FROM Checkouts WHERE idBook = ?;", [req.params.id]);
+                if ((await conn.query("SELECT id FROM Checkouts WHERE idCheckoutDate = ?;",
+                    [chDateId])).length === 0) {
+                    await conn.query("DELETE FROM CheckoutDates WHERE id = ?;", [chDateId]);
+                }
+            }
+
+            res.json({ "status": "OK" });
+        } catch (err) {
+            console.log(err);
+            res.json({ "status": "NOT OK"});
         } finally {
             if (conn) {
                 conn.release();

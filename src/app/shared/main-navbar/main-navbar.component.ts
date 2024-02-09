@@ -16,7 +16,8 @@ export class MainNavbarComponent {
 
   ngOnInit() {
     this.isUserAdmin = this.authService.isUserAdmin();
-    this.sub = this.authService.getIsUserAdminSubject().subscribe((res) => this.isUserAdmin = res);
+    this.sub = this.authService.getIsUserAdminSubject()
+      .subscribe((res: boolean) => this.isUserAdmin = res);
   }
 
   ngOnDestroy() {

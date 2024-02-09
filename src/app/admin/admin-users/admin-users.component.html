@@ -1,13 +1,14 @@
 <app-admin-header></app-admin-header>
 <main [ngClass]="'container'">
     <section [ngClass]="'row'">
-        <article *ngFor="let user of users">
+        <article *ngFor="let user of users; let i = index">
             <div [ngClass]="'col-6'">
                 <p>Username: {{user.username}}</p>
                 <p>Name: {{user.name}}</p>
                 <p>Surname: {{user.surname}}</p>
-                <button (click)="changeMemTypeById(user.id, user.memType)">{{user.memType}}</button><br>
-                <button (click)="onDelete(user.id)">Delete</button>
+                <button (click)="changeMemTypeById(user.id, user.memType)">{{user.memType}}</button>
+                <button *ngIf="!isUserOwingBooks(i)" (click)="onDelete(user.id)">Delete</button>
+                <button *ngIf="isUserOwingBooks(i)" disabled>Owes</button>
             </div>
         </article>
     </section>

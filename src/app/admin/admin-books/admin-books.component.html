@@ -6,7 +6,12 @@
                 <p>Title: {{book.title}}</p>
                 <p>Genre: {{book.genre.type}}</p>
                 <p>Author: {{book.author.name}} {{book.author.surname}}</p>
-                <button (click)="onRemove(book.id)">Remove</button>
+                <button *ngIf="!book.checkout" (click)="onRemove(book.id)">Remove</button>
+                <div *ngIf="book.checkout">
+                    <p>Checkout date: {{book.checkout.checkoutDate.checkoutDate}}</p>
+                    <p>Return date: {{book.checkout.checkoutDate.returnDate}}</p>    
+                    <button disabled>Lent</button>
+                </div>
             </div>
         </article>
     </section>

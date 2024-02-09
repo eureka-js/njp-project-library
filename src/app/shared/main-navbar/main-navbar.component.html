@@ -1,10 +1,11 @@
 <nav [ngClass]="'container'">
     <div [ngClass]="'row'">
         <div [ngClass]="'col-12'">
-            <a [routerLink]="['/']">Lend</a>
+            <a [routerLink]="['/']">Catalogue</a>
+            <a [routerLink]="['/books-borrowed']">Borrowed books</a>
             <a [routerLink]="['/donate']">Donate</a>
             <a *ngIf="isUserAdmin" [routerLink]="['/admin']">Admin</a>
-            <a (click)="onLogout()">Logout</a>
+            <a href="#" (click)="onLogout()">Logout</a>
         </div>
     </div>
 </nav>

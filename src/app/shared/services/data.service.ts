@@ -6,6 +6,9 @@ import { environment } from "../environment";
 import { Book } from "../models/book.model";
 import { Genre } from "../models/genre.model";
 import { Author } from "../models/author.model";
+import { Checkout } from "../models/checkout.model";
+import { Membership } from "../models/membership.model";
+import { CheckoutDate } from "../models/checkout-date.model";
 
 
 @Injectable({
@@ -35,7 +38,7 @@ export class DataService {
             name: user.name,
             surname: user.surname,
             email: user.email 
-        }).pipe((res: any) => {
+        }).pipe(map((res: any) => {
             if (res.status === "NOT OK") {
                 return throwError(() => new TypeError(res.description));
             }
@@ -44,11 +47,11 @@ export class DataService {
             user.memType = res.memType;
 
             return res;
-        });
+        }));
     }
 
     changeMemTypeById(id: number, memType: string) {
-        return this.httpClient.put(this.apiUrl + "/userMemType/" + id, { memType: memType});
+        return this.httpClient.put(this.apiUrl + "/userMemType/" + id, { memType: memType });
     }
 
     delUserById(id: number) {
@@ -57,13 +60,50 @@ export class DataService {
 
     getBooks() {
         return this.httpClient.get(this.apiUrl + "/books").pipe(map((res: any) => {
-            return res.books.map((bookRaw: any) => new Book(
-                bookRaw.id,
-                new Genre(bookRaw.idGenre, bookRaw.type),
-                new Author(bookRaw.idAuthor, bookRaw.name, bookRaw.surname),
-                bookRaw.title
+            return res.books.map((res: any) => new Book(
+                res.id,
+                new Genre(res.idGenre, res.genreType),
+                new Author(res.idAuthor, res.name, res.surname),
+                res.title,
+                res.idCheckout ? new Checkout(
+                    res.idCheckout,
+                    new Membership(res.idMembership, res.idMembershipType, res.idUser),
+                    new CheckoutDate(res.idCheckoutDate, res.checkoutDate, res.returnDate)
+                ) : undefined
             ));
         }));
+    }
+
+    lendBookById(bookId: number, userId?: number) {
+        return this.httpClient.put(
+            this.apiUrl + "/bookLend", { bookId: bookId, userId: userId }
+        ).pipe(map((res: any) => {
+            if (res.status === "NOT OK") {
+                return throwError(() => new TypeError(res.description));
+            }
+
+            // Reformatting the checkout data into the object of class Checkout
+            res.checkout = new Checkout(
+                res.checkout.idCheckout,
+                new Membership(
+                    res.checkout.idMembership,
+                    res.checkout.idMembershipType,
+                    res.checkout.idUser
+                ),
+                new CheckoutDate(
+                    res.checkout.idCheckoutDate,
+                    res.checkout.checkoutDate,
+                    res.checkout.returnDate
+                )
+            );
+
+
+            return res;
+        }));
+    }
+
+    returnBookById(bookId: number) {
+        return this.httpClient.delete(this.apiUrl + "/bookCheckout/" + bookId);
     }
 
     addBook(book: Book) {
@@ -72,7 +112,7 @@ export class DataService {
             genreType: book.genre.type,
             authorName: book.author.name,
             authorSurname: book.author.surname
-         }).pipe((res: any) => {
+         }).pipe(map((res: any) => {
             if (res.status === "NOT OK") {
                 return throwError(() => new TypeError(res.description));
             }
@@ -82,7 +122,7 @@ export class DataService {
             book.author.id = res.insertAuthorId;
 
             return res;
-        });
+        }));
     }
 
     delBookById(id: number) {

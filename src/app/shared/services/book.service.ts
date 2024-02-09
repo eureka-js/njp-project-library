@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Book } from "../models/book.model";
 import { BehaviorSubject, catchError, throwError } from "rxjs";
 import { DataService } from './data.service';
+import { Checkout } from "../models/checkout.model";
 
 
 
@@ -33,12 +34,36 @@ export class BookService {
             });
     }
 
+    lendBookById(bookId: number, userId?: number) {
+        this.dataService.lendBookById(bookId, userId).subscribe((res: any) => {
+            if (res.status === "OK") {
+                let bIndex = this.books.findIndex(b => b.id === bookId);
+                if (bIndex !== -1) {
+                    this.books[bIndex].checkout = res.checkout;
+                    this.booksSubject.next([...this.books]);
+                }
+            }
+        });
+    }
+
+    returnBookById(bookId: number) {
+        this.dataService.returnBookById(bookId).subscribe((res: any) => {
+            if (res.status === "OK") {
+                let bIndex = this.books.findIndex(b => b.id === bookId);
+                if (bIndex !== -1) {
+                    this.books[bIndex].checkout = undefined;
+                    this.booksSubject.next([...this.books]);
+                }
+            }
+        });
+    };
+
     delBookById(id: number) {
         this.dataService.delBookById(id).subscribe((res: any) => {
             if (res.status === "OK") {
-                let bookIndex = this.books.findIndex(b => b.id === id);
-                if (bookIndex !== -1) {
-                    this.books.splice(bookIndex, 1)
+                let bIndex = this.books.findIndex(b => b.id === id);
+                if (bIndex !== -1) {
+                    this.books.splice(bIndex, 1)
                     this.booksSubject.next([...this.books]);
                 }
             }

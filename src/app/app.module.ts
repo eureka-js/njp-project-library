@@ -12,6 +12,8 @@ import { RegisterModule } from './register/register.module';
 import { AuthService } from './shared/services/auth.service';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './auth/auth.interceptor';
+import { BookService } from './shared/services/book.service';
+import { UserService } from './shared/services/user.service';
 
 
 @NgModule({
@@ -26,7 +28,12 @@ import { AuthInterceptor } from './auth/auth.interceptor';
     AuthModule,
     RegisterModule
   ],
-  providers: [AuthService, {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],
+  providers: [
+    AuthService,
+    UserService,
+    BookService,
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
