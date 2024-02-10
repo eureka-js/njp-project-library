@@ -1,7 +1,7 @@
 <app-main-header></app-main-header>
 <main [ngClass]="'container'">
     <section [ngClass]="'row'">
-        <article *ngFor="let book of borrowedBooks">
+        <article *ngFor="let book of books | filter: 'checkout.membership.idUser': getUser()?.id">
             <div [ngClass]="'col-6'">
                 <p>Title: {{book.title}}</p>
                 <p>Genre: {{book.genre.type}}</p>

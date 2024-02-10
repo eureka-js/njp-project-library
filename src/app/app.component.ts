@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from './shared/services/auth.service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { User } from './shared/models/user.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -10,17 +11,22 @@ import { User } from './shared/models/user.model';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'njp-project';
+  title: string = 'njp-project';
+  whoAmISub?: Subscription;
 
-  constructor(private modalService: NgbModal, private auth: AuthService, private router: Router) {};
+  constructor(private modalService: NgbModal, private authService: AuthService, private router: Router) {};
 
   ngOnInit() {
-    this.auth.whoAmI().subscribe((res: {status: string, user?: User}) => {
+    this.whoAmISub = this.authService.whoAmI().subscribe((res: {status: string, user?: User}) => {
       if (res.status == "NOT OK") {
         this.router.navigate(['login']);
       }
     });
   }
+
+  ngOnDestroy() {
+    this.whoAmISub?.unsubscribe();
+  };
 
   public open(modal: any): void {
     this.modalService.open(modal);

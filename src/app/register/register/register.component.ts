@@ -25,32 +25,29 @@ export class RegisterComponent {
     });
   }
 
-  onRegister = () => {
-      try {
-          if (this.registerForm.value.password != this.registerForm.value.passRepeat) {
-              throw new TypeError("Passwords must match");
-          } else if (!new RegExp('^[a-zA-Z0-9_\.-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$').test(this.registerForm.value.email)) {
-              throw new TypeError("E-mail format is invalid");
-          }
-
-          this.userService.addUser(
-            new User(
-              -1,
-              this.registerForm.value.username,
-              this.registerForm.value.name,
-              this.registerForm.value.surname,
-              this.registerForm.value.email,
-              ""
-            ), 
-            this.registerForm.value.password
-          );
-          this.message = "Register successful"
-      } catch(e) {
-          if (e instanceof TypeError) {
-              this.message = e.message;
+  onRegister() {
+    if (this.registerForm.value.password != this.registerForm.value.passRepeat) {
+      this.message = "Passwords must match";
+    } else if (!new RegExp('^[a-zA-Z0-9_\.-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$').test(this.registerForm.value.email)) {
+      this.message = "E-mail format is invalid";
+    } else {
+      this.userService.addUser(new User(
+        -1,
+        this.registerForm.value.username,
+        this.registerForm.value.name,
+        this.registerForm.value.surname,
+        this.registerForm.value.email,
+        "",
+        this.registerForm.value.password
+      )).subscribe({
+        next: () => this.message = "Register successful",
+        error: (err) => {
+          if (err instanceof TypeError) {
+          this.message = err.message;
           } else {
-              console.error(e);
+            console.error(err);
           }
-      }
+      }});
+    }
   };
 }

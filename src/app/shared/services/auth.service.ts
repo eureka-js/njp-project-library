@@ -5,6 +5,7 @@ import { map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { User } from "../models/user.model";
+import { DataService } from "./data.service";
 
 
 @Injectable({
@@ -12,12 +13,13 @@ import { User } from "../models/user.model";
 })
 export class AuthService {
     private user?: User;
+    private userSubject?: Subject<User | undefined> = new Subject<User | undefined>();
     private isUserAdminSubject: Subject<boolean> = new Subject<boolean>();
     private token?: string;
     errEmmitter: Subject<string> = new Subject<string>();
     private authUrl: string = environment.API_URL + "/authenticate";
 
-    constructor(private http: HttpClient, private router: Router) {};
+    constructor(private http: HttpClient, private router: Router, private dataService: DataService) {};
 
     login(loginVals: { username: string, password: string }) {
         this.http.post(this.authUrl, { username: loginVals.username, password: loginVals.password })
@@ -31,8 +33,10 @@ export class AuthService {
                             res.user.name,
                             res.user.surname,
                             res.user.email,
-                            res.user.memType
+                            res.user.memType,
+                            res.user.hashedPass
                         );
+                        this.userSubject?.next(this.user);
                         this.isUserAdminSubject.next(this.user.memType === "admin");
 
                         this.router.navigate(['/']);
@@ -42,8 +46,13 @@ export class AuthService {
                 });
     }
 
+    updateUser(user: User) {
+        return this.dataService.updateUser(user).pipe(map(() => this.user = user));
+    }
+
     logout() {
         this.user = undefined;
+        this.userSubject?.next(undefined);
         this.token = undefined;
         localStorage.removeItem("token");
 
@@ -52,6 +61,10 @@ export class AuthService {
 
     getUser() {
         return this.user;
+    }
+
+    getUserSubject() {
+        return this.userSubject;
     }
 
     getIsUserAdminSubject() {
@@ -81,6 +94,7 @@ export class AuthService {
                     this.logout();
                 } else if (res.status == "OK") {
                     this.user = res.user;
+                    this.userSubject?.next(this.user);
                     this.isUserAdminSubject.next(this.user?.memType === "admin");
                 }
 

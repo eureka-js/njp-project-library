@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { User } from "../models/user.model";
-import { BehaviorSubject, catchError, throwError } from "rxjs";
+import { BehaviorSubject, catchError, map, throwError } from "rxjs";
 import { DataService } from './data.service';
 
 
@@ -24,13 +24,15 @@ export class UserService {
         return this.usersSubject;
     };
 
-    addUser(user: User, pass: string) {
-        this.dataService.addUser(user, pass)
-            .pipe(catchError((err) => { return throwError(() => new TypeError(err)) }))
-            .subscribe(() => {
+    addUser(user: User) {
+        return this.dataService.addUser(user).pipe(
+            catchError((err) => throwError(() => err)),
+            map((res) => {
                 this.users.push(user);
                 this.usersSubject.next([...this.users]);
-            });
+
+                return res;
+            }));
     };
 
     changeMemTypeById(id: number, memType: string) {
@@ -46,7 +48,7 @@ export class UserService {
     }
 
     delUserById(id: number) {
-        this.dataService.delUserById(id).subscribe((res: any) => {
+        return this.dataService.delUserById(id).pipe(map((res: any) => {
             if (res.status === "OK") {
                 let userIndex = this.users.findIndex(u => u.id === id);
                 if (userIndex !== -1) {
@@ -54,6 +56,8 @@ export class UserService {
                     this.usersSubject.next([...this.users]);
                 }
             }
-        });
+
+            return res;
+        }));
     }
 };

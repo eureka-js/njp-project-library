@@ -4,6 +4,7 @@
             <a [routerLink]="['/']">Catalogue</a>
             <a [routerLink]="['/books-borrowed']">Borrowed books</a>
             <a [routerLink]="['/donate']">Donate</a>
+            <a [routerLink]="['/user']">User info</a>
             <a *ngIf="isUserAdmin" [routerLink]="['/admin']">Admin</a>
             <a href="#" (click)="onLogout()">Logout</a>
         </div>

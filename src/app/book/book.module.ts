@@ -6,19 +6,21 @@ import { BookRoutingModule } from './book-routing.module';
 import { BookDonateComponent } from './book-donate/book-donate.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BooksBorrowedComponent } from './books-borrowed/books-borrowed.component';
+import { FilterPipe } from '../shared/pipes/filter.pipe';
 
 
 @NgModule({
   declarations: [
     BooksComponent,
     BookDonateComponent,
-    BooksBorrowedComponent
+    BooksBorrowedComponent,
+    FilterPipe
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     SharedModule,
-    BookRoutingModule
+    BookRoutingModule,
   ]
 })
 export class BookModule { }

@@ -9,7 +9,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             res.json({
                 status: "OK",
                 users: await conn.query(
-                    `SELECT u.id, u.username, u.name, u.surname, u.email, mt.type AS memType
+                    `SELECT u.id, u.username, u.name, u.surname, u.email, mt.type AS memType, u.password
                     FROM Users AS u INNER JOIN
                         Memberships AS m ON u.id = m.idUser INNER JOIN
                         MembershipTypes AS mt ON m.idMembershipType = mt.id;`
@@ -92,6 +92,51 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             await conn.query("DELETE FROM Users WHERE id = ?;", [req.params.id]);
 
             res.json({ "status": "OK" });
+        } catch (err) {
+            console.log(err);
+            res.json({ "status": "NOT OK" });
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    }).put(async (req, res) => {
+                let conn;
+        try {
+            conn = await pool.getConnection();
+
+            let userPass = (await conn.query("SELECT password FROM Users WHERE id = ?;", [req.params.id]))[0]?.password;
+            if (!userPass) {
+                return res.json({"status": "NOT OK" });
+            }
+
+            if (req.body.password === userPass || bcrypt.compareSync(req.body.password, userPass)) {
+                await conn.query(
+                    `UPDATE Users
+                    SET username = ?, name = ?, surname = ?, email = ?
+                    WHERE id = ?;`,
+                    [req.body.username, req.body.name, req.body.surname, req.body.email, req.params.id]
+                );
+
+                res.json({
+                    "status" : "OK",
+                    "hashedPass": userPass
+                });
+            } else {
+                bcrypt.hash(req.body.password, null, null, async (err, hash) => {
+                    await conn.query(
+                        `UPDATE Users
+                        SET username = ?, name = ?, surname = ?, email = ?, password = ?
+                        WHERE id = ?;`,
+                        [req.body.username, req.body.name, req.body.surname, req.body.email, hash, req.params.id]
+                    );
+
+                    res.json({
+                        "status" : "OK",
+                        "hashedPass": hash
+                    });
+                })
+            }
         } catch (err) {
             console.log(err);
             res.json({ "status": "NOT OK" });

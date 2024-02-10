@@ -6,7 +6,6 @@ import { AdminRoutingModule } from './admin-router.module';
 import { SharedModule } from '../shared/shared.module';
 
 
-
 @NgModule({
   declarations: [
     AdminBooksComponent,
@@ -18,4 +17,8 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule
   ]
 })
-export class AdminModule { }
+export class AdminModule { 
+  ngOnInit() {
+    console.log("AdminModule");
+  }
+}

@@ -4,24 +4,28 @@ import { Book } from 'src/app/shared/models/book.model';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BookService } from 'src/app/shared/services/book.service';
 
+
 @Component({
   selector: 'app-books-borrowed',
   templateUrl: './books-borrowed.component.html',
   styleUrls: ['./books-borrowed.component.css']
 })
 export class BooksBorrowedComponent {
-  borrowedBooks: Book[] = [];
-  borrowedBooksSub!: Subscription;
+  books: Book[] = [];
+  booksSub!: Subscription;
 
   constructor(private bookService: BookService, private authService: AuthService) {};
 
   ngOnInit() {
-    this.borrowedBooksSub = this.bookService.getBooks().subscribe((res) => 
-      this.borrowedBooks = res.filter(b => b.checkout?.membership.idUser === this.authService.getUser()?.id));
+    this.booksSub = this.bookService.getBooks().subscribe((res) => this.books = res);
+  }
+
+  getUser() {
+    return this.authService.getUser();
   }
 
   ngOnDestroy() {
-    this.borrowedBooksSub.unsubscribe();
+    this.booksSub.unsubscribe();
   }
 
   onReturn(bookId: number) {

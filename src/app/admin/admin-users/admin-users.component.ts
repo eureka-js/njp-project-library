@@ -19,7 +19,11 @@ export class AdminUsersComponent {
   constructor(private userService: UserService, private bookService: BookService) {};
 
   ngOnInit() {
-    this.usersSub = this.userService.getUsers().subscribe((res: User[]) => this.users = res);
+    console.log("Admin-users");
+    this.usersSub = this.userService.getUsers().subscribe((res: User[]) => {
+      this.users = res;
+      console.log(this.users);
+    });
     this.booksSub = this.bookService.getBooks().subscribe((res: Book[]) => this.books = res);
   }
 
@@ -37,6 +41,7 @@ export class AdminUsersComponent {
   }
 
   onDelete(id: number) {
+    console.log("onDelete");
     this.userService.delUserById(id);
   }
 }

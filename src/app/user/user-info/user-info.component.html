@@ -1,15 +1,17 @@
-<app-header></app-header>
+<app-main-header></app-main-header>
 <main [ngClass]="'container'">
     <div [ngClass]="'row'">
         <i>{{message}}</i><br>
-        <form (submit)="onRegister()" [formGroup]="registerForm">
+        <form [formGroup]="userForm">
             <input type="text" id="username" placeholder="Username" formControlName="username"><br>
             <input type="password" id="pass0" placeholder="Password" formControlName="password"><br>
             <input type="password" id="pass1" placeholder="Repeat password" formControlName="passRepeat"><br>
             <input type="text" id="name" placeholder="Name" formControlName="name"><br>
             <input type="text" id="surname" placeholder="Surname" formControlName="surname"><br>
             <input type="email" id="email" placeholder="E-mail" formControlName="email"><br>
-            <button type="submit" [disabled]="registerForm.invalid">Register</button><br>
+            <button (click)="onUpdate()" [disabled]="userForm.errors !== null">Update</button>
+            <button *ngIf="!isUserOwingBooks" (click)="onDelete()">Delete account</button>
+            <button *ngIf="isUserOwingBooks" disabled>Delete account (Owing)</button>
         </form>
     </div>
 </main>

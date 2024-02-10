@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
@@ -10,16 +11,21 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 export class LoginComponent {
   message: string = "";
   loginForm!: FormGroup;
+  errEmmiterSub?: Subscription;
 
   constructor(private authService: AuthService) {};
 
   ngOnInit() {
-    this.authService.errEmmitter.subscribe((err: string) => this.message = err);
+    this.errEmmiterSub = this.authService.errEmmitter.subscribe((err: string) => this.message = err);
 
     this.loginForm = new FormGroup({
       "username": new FormControl(null, [Validators.required]),
       "password": new FormControl(null, [Validators.required])
     });
+  }
+
+  ngOnDestroy() {
+    this.errEmmiterSub?.unsubscribe();
   }
 
   onLogin() {

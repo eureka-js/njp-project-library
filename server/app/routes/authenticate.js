@@ -26,6 +26,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                         memType: (await conn.query(
                             "SELECT type FROM MembershipTypes WHERE id = ?;",
                             [idMembTypeList[0].idMembershipType]))[0].type,
+                        hashedPass: userList[0].password
                     }
                     res.json({
                         "status": "OK",

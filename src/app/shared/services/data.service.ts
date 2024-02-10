@@ -31,16 +31,36 @@ export class DataService {
         }));
     }
 
-    addUser(user: User, pass: string) {
-        return this.httpClient.post(this.apiUrl + "/users", { 
+    updateUser(user: User) {
+        return this.httpClient.put(this.apiUrl + "/user/" + user.id, {
+            id: user.id,
             username: user.username,
-            password: pass,
             name: user.name,
             surname: user.surname,
-            email: user.email 
+            email: user.email,
+            memType: user.memType,
+            password: user.hashedPass
         }).pipe(map((res: any) => {
             if (res.status === "NOT OK") {
                 return throwError(() => new TypeError(res.description));
+            }
+
+            user.hashedPass = res.hashedPass;
+
+            return res;
+        }));
+    }
+
+    addUser(user: User) {
+        return this.httpClient.post(this.apiUrl + "/users", { 
+            username: user.username,
+            name: user.name,
+            surname: user.surname,
+            email: user.email,
+            password: user.hashedPass
+        }).pipe(map((res: any) => {
+            if (res.status === "NOT OK") {
+                throw new TypeError(res.description);
             }
 
             user.id = res.insertId;

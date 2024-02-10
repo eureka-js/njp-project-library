@@ -7,8 +7,8 @@
                 <p>Name: {{user.name}}</p>
                 <p>Surname: {{user.surname}}</p>
                 <button (click)="changeMemTypeById(user.id, user.memType)">{{user.memType}}</button>
-                <button *ngIf="!isUserOwingBooks(i)" (click)="onDelete(user.id)">Delete</button>
-                <button *ngIf="isUserOwingBooks(i)" disabled>Owes</button>
+                <button *ngIf="!isUserOwingBooks(i)" (click)="onDelete(user.id)">Delete account</button>
+                <button *ngIf="isUserOwingBooks(i)" disabled>Delete account (Owes)</button>
             </div>
         </article>
     </section>

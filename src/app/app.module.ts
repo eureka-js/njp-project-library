@@ -14,6 +14,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { BookService } from './shared/services/book.service';
 import { UserService } from './shared/services/user.service';
+import { UserModule } from './user/user.module';
 
 
 @NgModule({
@@ -26,8 +27,9 @@ import { UserService } from './shared/services/user.service';
     SharedModule,
     BookModule,
     AuthModule,
-    RegisterModule
-  ],
+    RegisterModule,
+    UserModule
+],
   providers: [
     AuthService,
     UserService,
