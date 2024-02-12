@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { environment } from '../environment';
-import { Observable, Subject } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
@@ -13,15 +13,15 @@ import { DataService } from "./data.service";
 })
 export class AuthService {
     private user?: User;
-    private userSubject?: Subject<User | undefined> = new Subject<User | undefined>();
-    private isUserAdminSubject: Subject<boolean> = new Subject<boolean>();
+    private userSubject: BehaviorSubject<User | undefined> = new BehaviorSubject<User | undefined>(undefined);
+    private isUserAdminSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private token?: string;
     errEmmitter: Subject<string> = new Subject<string>();
     private authUrl: string = environment.API_URL + "/authenticate";
 
     constructor(private http: HttpClient, private router: Router, private dataService: DataService) {};
 
-    login(loginVals: { username: string, password: string }) {
+    login(loginVals: { username: string, password: string }, urlPath: string) {
         this.http.post(this.authUrl, { username: loginVals.username, password: loginVals.password })
             .subscribe((res: any) => {
                     if (res.status === "OK") {
@@ -39,7 +39,7 @@ export class AuthService {
                         this.userSubject?.next(this.user);
                         this.isUserAdminSubject.next(this.user.memType === "admin");
 
-                        this.router.navigate(['/']);
+                        this.router.navigate([urlPath]);
                     } else {
                         this.errEmmitter.next(res.description);
                     }
@@ -47,7 +47,24 @@ export class AuthService {
     }
 
     updateUser(user: User) {
-        return this.dataService.updateUser(user).pipe(map(() => this.user = user));
+        return this.dataService.updateUser(user).pipe(map((res) => {
+            if (res.status === "NOT OK") {
+                return res;
+            }
+
+            user.hashedPass = res.hashedPass;
+            this.user = user;
+            this.userSubject?.next(this.user);
+            this.isUserAdminSubject.next(this.user.memType === "admin");
+
+            return {
+                status: res.status,
+                loginVals: {
+                    username: this.user.username,
+                    password: this.user.hashedPass    
+                }
+            };
+        }));
     }
 
     logout() {
@@ -94,10 +111,10 @@ export class AuthService {
                     this.logout();
                 } else if (res.status == "OK") {
                     this.user = res.user;
-                    this.userSubject?.next(this.user);
+                    this.userSubject.next(this.user);
                     this.isUserAdminSubject.next(this.user?.memType === "admin");
                 }
-
+                
                 return res;
             }));
         } else {

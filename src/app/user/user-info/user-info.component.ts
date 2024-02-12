@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Book } from 'src/app/shared/models/book.model';
 import { User } from 'src/app/shared/models/user.model';
@@ -21,35 +22,31 @@ export class UserInfoComponent {
   message: string = "";
   userForm!: FormGroup;
   
-  constructor(private authService: AuthService, private bookService: BookService, private userService: UserService) {};
+  constructor(private authService: AuthService, private bookService: BookService
+    , private userService: UserService, private router: Router) {};
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    this.userForm = new FormGroup({
-      "username": new FormControl(this.user?.username, [Validators.required, this.isValueChangedValidator(this.user?.username)]),
-      "password": new FormControl("", [Validators.required, () => () => true]),
-      "passRepeat": new FormControl("", [Validators.required, () => () => true]),
-      "name": new FormControl(this.user?.name, [Validators.required, this.isValueChangedValidator(this.user?.name)]),
-      "surname": new FormControl(this.user?.surname, [Validators.required, this.isValueChangedValidator(this.user?.surname)]),
-      "email": new FormControl(this.user?.email, [Validators.required, this.isValueChangedValidator(this.user?.email)])
-    }, {validators: [(form: FormGroup) => Object.values(form.controls).some(c => 
-        c.status === "VALID") ? null : { "allControlsInvalid": true }] as ValidatorFn[] }
-    );
 
-    this.userSub = this.authService.getUserSubject()?.subscribe((res?: User) => {
+    this.userSub = this.authService.getUserSubject().subscribe((res?: User) => {
       this.user = res;
-      this.userForm.get("username")?.setValue(this.user?.username);
-      this.userForm.get("username")?.setValidators(this.isValueChangedValidator(this.user?.username));
-      this.userForm.get("name")?.setValue(this.user?.name);
-      this.userForm.get("name")?.setValidators(this.isValueChangedValidator(this.user?.name));
-      this.userForm.get("surname")?.setValue(this.user?.surname);
-      this.userForm.get("surname")?.setValidators(this.isValueChangedValidator(this.user?.surname));
-      this.userForm.get("email")?.setValue(this.user?.email);
-      this.userForm.get("email")?.setValidators(this.isValueChangedValidator(this.user?.email));
-      this.userForm.updateValueAndValidity();
+      this.userForm = new FormGroup({
+        "username": new FormControl(this.user?.username
+          , [Validators.required, this.isValueChangedValidator(this.user?.username)]),
+        "password": new FormControl("", [Validators.required, () => () => true]),
+        "passRepeat": new FormControl("", [Validators.required, () => () => true]),
+        "name": new FormControl(this.user?.name
+          , [Validators.required, this.isValueChangedValidator(this.user?.name)]),
+        "surname": new FormControl(this.user?.surname
+          , [Validators.required, this.isValueChangedValidator(this.user?.surname)]),
+        "email": new FormControl(this.user?.email
+          , [Validators.required, this.isValueChangedValidator(this.user?.email)])
+      }, {validators: [(form: FormGroup) => Object.values(form.controls).some(c => 
+          c.status === "VALID") ? null : { "allControlsInvalid": true }] as ValidatorFn[] }
+      );
     });
 
-    this.booksSub = this.bookService.getBooks()?.subscribe((res: Book[]) =>
+    this.booksSub = this.bookService.getBooksSubject()?.subscribe((res: Book[]) =>
       this.isUserOwingBooks = res.some(b => b.checkout?.membership.idUser === this.user?.id));
   }
 
@@ -67,7 +64,6 @@ export class UserInfoComponent {
     } else if (!new RegExp('^[a-zA-Z0-9_\.-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$').test(this.userForm.value.email)) {
       this.message = "E-mail format is invalid";
     } else {
-      this.userForm.disable();
       this.authService.updateUser(new User(
         this.user!.id,
         this.userForm.value.username,
@@ -76,15 +72,12 @@ export class UserInfoComponent {
         this.userForm.value.email,
         this.user!.memType,
         this.userForm.value.password || this.user!.hashedPass
-      )).subscribe(() => {
-        this.message = "Change successful";
+      )).subscribe((res: any) => {
+        if (res.status === "OK") {
+          this.authService.login(res.loginVals, this.router.url);
+        }
 
-        Object.keys(this.userForm.controls).filter(key => key !== "password" && key !== "passRepeat").forEach(key => {
-          const ctrl = this.userForm.get(key);
-          ctrl?.setValidators(this.isValueChangedValidator(ctrl.value));
-        });
-        this.userForm.updateValueAndValidity();
-        this.userForm.enable();
+        this.message = res.description;
       });
     }
   }

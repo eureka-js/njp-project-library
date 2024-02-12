@@ -17,7 +17,7 @@ export class BooksBorrowedComponent {
   constructor(private bookService: BookService, private authService: AuthService) {};
 
   ngOnInit() {
-    this.booksSub = this.bookService.getBooks().subscribe((res) => this.books = res);
+    this.booksSub = this.bookService.getBooksSubject().subscribe((res) => this.books = res);
   }
 
   getUser() {

@@ -105,12 +105,16 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         try {
             conn = await pool.getConnection();
 
-            let userPass = (await conn.query("SELECT password FROM Users WHERE id = ?;", [req.params.id]))[0]?.password;
-            if (!userPass) {
-                return res.json({"status": "NOT OK" });
+            let usernameAndPass = (await conn.query("SELECT username, password FROM Users WHERE id = ?;", [req.params.id]))[0];
+            console.log(usernameAndPass);
+            if (!usernameAndPass) {
+                return res.json({"status": "NOT OK", "description": "You were not found in the database" });
             }
-
-            if (req.body.password === userPass || bcrypt.compareSync(req.body.password, userPass)) {
+            
+            if (req.body.username !== usernameAndPass.username
+                && (await conn.query("SELECT id FROM Users WHERE username = ?;", [req.body.username])).length > 0) {
+                return res.json({"status": "NOT OK", "description": "Username is already taken" });
+            } else if (bcrypt.compareSync(req.body.password, usernameAndPass.password)) {
                 await conn.query(
                     `UPDATE Users
                     SET username = ?, name = ?, surname = ?, email = ?

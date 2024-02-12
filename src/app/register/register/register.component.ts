@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { User } from 'src/app/shared/models/user.model';
 import { UserService } from 'src/app/shared/services/user.service';
 
@@ -12,7 +13,7 @@ export class RegisterComponent {
   message: string = "";
   registerForm!: FormGroup;
   
-  constructor(private userService: UserService) {};
+  constructor(private userService: UserService, private router: Router) {};
 
   ngOnInit() {
     this.registerForm = new FormGroup({

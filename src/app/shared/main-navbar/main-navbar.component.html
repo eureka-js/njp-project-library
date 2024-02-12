@@ -1,10 +1,10 @@
 <nav [ngClass]="'container'">
     <div [ngClass]="'row'">
         <div [ngClass]="'col-12'">
-            <a [routerLink]="['/']">Catalogue</a>
-            <a [routerLink]="['/books-borrowed']">Borrowed books</a>
-            <a [routerLink]="['/donate']">Donate</a>
-            <a [routerLink]="['/user']">User info</a>
+            <a [ngClass]="currPathUrl === '/' ? 'currUrlA' : ''" [routerLink]="['/']">Catalogue</a>
+            <a [ngClass]="currPathUrl === '/books-borrowed' ? 'currUrlA' : ''" [routerLink]="['/books-borrowed']">Borrowed books</a>
+            <a [ngClass]="currPathUrl === '/donate' ? 'currUrlA' : ''" [routerLink]="['/donate']">Donate</a>
+            <a [ngClass]="currPathUrl === '/user' ? 'currUrlA' : ''" [routerLink]="['/user']">User info</a>
             <a *ngIf="isUserAdmin" [routerLink]="['/admin']">Admin</a>
             <a href="#" (click)="onLogout()">Logout</a>
         </div>

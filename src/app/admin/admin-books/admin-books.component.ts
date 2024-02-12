@@ -15,7 +15,7 @@ export class AdminBooksComponent {
   constructor(private bookService: BookService) {};
 
   ngOnInit() {
-    this.booksSub = this.bookService.getBooks().subscribe((res) => this.books = res); 
+    this.booksSub = this.bookService.getBooksSubject().subscribe((res: Book[]) => this.books = res); 
   }
 
   ngOnDestroy() {

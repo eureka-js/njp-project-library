@@ -1,18 +1,20 @@
 <app-main-header></app-main-header>
 <main [ngClass]="'container'">
     <div [ngClass]="'row'">
-        <i>{{message}}</i><br>
-        <form [formGroup]="userForm">
-            <input type="text" id="username" placeholder="Username" formControlName="username"><br>
-            <input type="password" id="pass0" placeholder="Password" formControlName="password"><br>
-            <input type="password" id="pass1" placeholder="Repeat password" formControlName="passRepeat"><br>
-            <input type="text" id="name" placeholder="Name" formControlName="name"><br>
-            <input type="text" id="surname" placeholder="Surname" formControlName="surname"><br>
-            <input type="email" id="email" placeholder="E-mail" formControlName="email"><br>
-            <button (click)="onUpdate()" [disabled]="userForm.errors !== null">Update</button>
-            <button *ngIf="!isUserOwingBooks" (click)="onDelete()">Delete account</button>
-            <button *ngIf="isUserOwingBooks" disabled>Delete account (Owing)</button>
-        </form>
+        <div [ngClass]="'col-12'">
+            <i >{{message}}</i><br>
+            <form [ngClass]="'col-12'" [formGroup]="userForm">
+                <input type="text" id="username" placeholder="Username" formControlName="username"><br>
+                <input type="password" id="pass0" placeholder="Password" formControlName="password"><br>
+                <input type="password" id="pass1" placeholder="Repeat password" formControlName="passRepeat"><br>
+                <input type="text" id="name" placeholder="Name" formControlName="name"><br>
+                <input type="text" id="surname" placeholder="Surname" formControlName="surname"><br>
+                <input type="email" id="email" placeholder="E-mail" formControlName="email"><br>
+                <button (click)="onUpdate()" [disabled]="userForm.errors" class="good_button">Update</button>
+                <button *ngIf="!isUserOwingBooks" (click)="onDelete()" class="bad_button">Delete account</button>
+                <button *ngIf="isUserOwingBooks" disabled class="bad_button">Delete account (Owing)</button>
+            </form>    
+        </div>
     </div>
 </main>
 <app-footer></app-footer>

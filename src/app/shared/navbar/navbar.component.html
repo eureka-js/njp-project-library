@@ -1,8 +1,8 @@
 <nav [ngClass]="'container'">
     <div [ngClass]="'row'">
         <div [ngClass]="'col-12'">
-            <a [routerLink]="['/login']">Login</a>
-            <a [routerLink]="['/register']">Register</a>
+            <a [ngClass]="currPathUrl === '/login' ? 'currUrlA' : ''" [routerLink]="['/login']">Login</a>
+            <a [ngClass]="currPathUrl === '/register' ? 'currUrlA' : ''" [routerLink]="['/register']">Register</a>
         </div>
     </div>
 </nav>

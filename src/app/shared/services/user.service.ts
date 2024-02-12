@@ -36,7 +36,7 @@ export class UserService {
     };
 
     changeMemTypeById(id: number, memType: string) {
-        this.dataService.changeMemTypeById(id, memType).subscribe((res: any) => {
+        return this.dataService.changeMemTypeById(id, memType).pipe(map((res: any) => {
             if (res.status === "OK") {
                 let userIndex = this.users.findIndex(u => u.id === id);
                 if (userIndex !== -1) {
@@ -44,7 +44,9 @@ export class UserService {
                     this.usersSubject.next([...this.users]);
                 }
             }
-        });
+
+            return res;
+        }));
     }
 
     delUserById(id: number) {

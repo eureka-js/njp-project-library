@@ -1,15 +1,13 @@
 <app-admin-header></app-admin-header>
 <main [ngClass]="'container'">
-    <section [ngClass]="'row'">
-        <article *ngFor="let user of users; let i = index">
-            <div [ngClass]="'col-6'">
-                <p>Username: {{user.username}}</p>
-                <p>Name: {{user.name}}</p>
-                <p>Surname: {{user.surname}}</p>
-                <button (click)="changeMemTypeById(user.id, user.memType)">{{user.memType}}</button>
-                <button *ngIf="!isUserOwingBooks(i)" (click)="onDelete(user.id)">Delete account</button>
-                <button *ngIf="isUserOwingBooks(i)" disabled>Delete account (Owes)</button>
-            </div>
+    <section [ngClass]="'row'"><br>
+        <article *ngFor="let user of users; let i = index" [ngClass]="'col-lg-4 col-sm-12'">
+            <p>Username: {{user.username}}</p>
+            <p>Name: {{user.name}}</p>
+            <p>Surname: {{user.surname}}</p>
+            <button (click)="changeMemTypeById(user.id, user.memType)" class="good_button">{{user.memType}}</button>
+            <button *ngIf="!isUserOwingBooks(i)" (click)="onDelete(user.id)" class="bad_button">Delete account</button>
+            <button *ngIf="isUserOwingBooks(i)" class="bad_button" disabled>Delete account (Owes)</button>
         </article>
     </section>
 </main>

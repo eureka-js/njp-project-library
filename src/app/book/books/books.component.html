@@ -1,14 +1,12 @@
 <app-main-header></app-main-header>
 <main [ngClass]="'container'">
     <section [ngClass]="'row'">
-        <article *ngFor="let book of books">
-            <div [ngClass]="'col-6'">
-                <p>Title: {{book.title}}</p>
-                <p>Genre: {{book.genre.type}}</p>
-                <p>Author: {{book.author.name}} {{book.author.surname}}</p>
-                <button *ngIf="book.checkout" disabled>Lent</button>
-                <button *ngIf="!book.checkout" (click)="onLend(book.id)">Lend</button>
-            </div>
+        <article *ngFor="let book of books" [ngClass]="'col-lg-4 col-sm-12'">
+            <p>Title: {{book.title}}</p>
+            <p>Genre: {{book.genre.type}}</p>
+            <p>Author: {{book.author.name}} {{book.author.surname}}</p>
+            <button *ngIf="book.checkout" disabled class="good_button">Lent</button>
+            <button *ngIf="!book.checkout" (click)="onLend(book.id)" class="good_button">Lend</button>
         </article>
     </section>
 </main>

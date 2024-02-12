@@ -1,15 +1,13 @@
 <app-main-header></app-main-header>
 <main [ngClass]="'container'">
     <section [ngClass]="'row'">
-        <article *ngFor="let book of books | filter: 'checkout.membership.idUser': getUser()?.id">
-            <div [ngClass]="'col-6'">
-                <p>Title: {{book.title}}</p>
-                <p>Genre: {{book.genre.type}}</p>
-                <p>Author: {{book.author.name}} {{book.author.surname}}</p>
-                <p>Checkout date: {{book.checkout?.checkoutDate?.checkoutDate}}</p>
-                <p>Return date: {{book.checkout?.checkoutDate?.returnDate}}</p>
-                <button (click)="onReturn(book.id)">Return</button>
-            </div>
+        <article *ngFor="let book of books | filter: 'checkout.membership.idUser': getUser()?.id" [ngClass]="'col-lg-4 col-sm-12'">
+            <p>Title: {{book.title}}</p>
+            <p>Genre: {{book.genre.type}}</p>
+            <p>Author: {{book.author.name}} {{book.author.surname}}</p>
+            <p>Checkout date: {{book.checkout?.checkoutDate?.checkoutDate}}</p>
+            <p>Return date: {{book.checkout?.checkoutDate?.returnDate}}</p>
+            <button (click)="onReturn(book.id)" class="good_button">Return</button>
         </article>
     </section>
 </main>

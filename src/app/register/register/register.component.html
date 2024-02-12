@@ -1,16 +1,18 @@
 <app-header></app-header>
 <main [ngClass]="'container'">
     <div [ngClass]="'row'">
-        <i>{{message}}</i><br>
-        <form (submit)="onRegister()" [formGroup]="registerForm">
-            <input type="text" id="username" placeholder="Username" formControlName="username"><br>
-            <input type="password" id="pass0" placeholder="Password" formControlName="password"><br>
-            <input type="password" id="pass1" placeholder="Repeat password" formControlName="passRepeat"><br>
-            <input type="text" id="name" placeholder="Name" formControlName="name"><br>
-            <input type="text" id="surname" placeholder="Surname" formControlName="surname"><br>
-            <input type="email" id="email" placeholder="E-mail" formControlName="email"><br>
-            <button type="submit" [disabled]="registerForm.invalid">Register</button><br>
-        </form>
+        <div [ngClass]="'col-12'">
+            <i>{{message}}</i><br>
+            <form (submit)="onRegister()" [formGroup]="registerForm">
+                <input type="text" id="username" placeholder="Username" formControlName="username"><br>
+                <input type="password" id="pass0" placeholder="Password" formControlName="password"><br>
+                <input type="password" id="pass1" placeholder="Repeat password" formControlName="passRepeat"><br>
+                <input type="text" id="name" placeholder="Name" formControlName="name"><br>
+                <input type="text" id="surname" placeholder="Surname" formControlName="surname"><br>
+                <input type="email" id="email" placeholder="E-mail" formControlName="email"><br>
+                <button type="submit" [disabled]="registerForm.invalid" class="good_button">Register</button><br>
+            </form>    
+        </div>
     </div>
 </main>
 <app-footer></app-footer>

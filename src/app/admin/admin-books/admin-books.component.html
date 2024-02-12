@@ -1,17 +1,15 @@
 <app-admin-header></app-admin-header>
 <main [ngClass]="'container'">
     <section [ngClass]="'row'">
-        <article *ngFor="let book of books">
-            <div [ngClass]="'col-6'">
-                <p>Title: {{book.title}}</p>
-                <p>Genre: {{book.genre.type}}</p>
-                <p>Author: {{book.author.name}} {{book.author.surname}}</p>
-                <button *ngIf="!book.checkout" (click)="onRemove(book.id)">Remove</button>
-                <div *ngIf="book.checkout">
-                    <p>Checkout date: {{book.checkout.checkoutDate.checkoutDate}}</p>
-                    <p>Return date: {{book.checkout.checkoutDate.returnDate}}</p>    
-                    <button disabled>Lent</button>
-                </div>
+        <article *ngFor="let book of books" [ngClass]="'col-lg-4 col-sm-12'">
+            <p>Title: {{book.title}}</p>
+            <p>Genre: {{book.genre.type}}</p>
+            <p>Author: {{book.author.name}} {{book.author.surname}}</p>
+            <button *ngIf="!book.checkout" (click)="onRemove(book.id)" class="bad_button">Remove</button>
+            <div *ngIf="book.checkout">
+                <p>Checkout date: {{book.checkout.checkoutDate.checkoutDate}}</p>
+                <p>Return date: {{book.checkout.checkoutDate.returnDate}}</p>    
+                <button class="bad_button" disabled>Lent</button>
             </div>
         </article>
     </section>

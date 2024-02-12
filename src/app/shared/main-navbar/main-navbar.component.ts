@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -10,18 +11,20 @@ import { Subscription } from 'rxjs';
 })
 export class MainNavbarComponent {
   isUserAdmin: boolean = false;
-  sub!: Subscription;
+  isUserAdminSub!: Subscription;
+  currPathUrl: string = "";
 
-  constructor(private authService: AuthService) {};
+  constructor(private authService: AuthService, private router: Router) {};
 
   ngOnInit() {
-    this.isUserAdmin = this.authService.isUserAdmin();
-    this.sub = this.authService.getIsUserAdminSubject()
+    this.isUserAdminSub = this.authService.getIsUserAdminSubject()
       .subscribe((res: boolean) => this.isUserAdmin = res);
+
+    this.currPathUrl = this.router.url;
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    this.isUserAdminSub.unsubscribe();
   }
   
   onLogout() {

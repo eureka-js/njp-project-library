@@ -33,22 +33,13 @@ export class DataService {
 
     updateUser(user: User) {
         return this.httpClient.put(this.apiUrl + "/user/" + user.id, {
-            id: user.id,
             username: user.username,
             name: user.name,
             surname: user.surname,
             email: user.email,
             memType: user.memType,
             password: user.hashedPass
-        }).pipe(map((res: any) => {
-            if (res.status === "NOT OK") {
-                return throwError(() => new TypeError(res.description));
-            }
-
-            user.hashedPass = res.hashedPass;
-
-            return res;
-        }));
+        }).pipe(map((res: any) => res));
     }
 
     addUser(user: User) {

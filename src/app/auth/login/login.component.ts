@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
@@ -12,8 +13,9 @@ export class LoginComponent {
   message: string = "";
   loginForm!: FormGroup;
   errEmmiterSub?: Subscription;
+  userSub?: Subscription;
 
-  constructor(private authService: AuthService) {};
+  constructor(private authService: AuthService, private router: Router) {};
 
   ngOnInit() {
     this.errEmmiterSub = this.authService.errEmmitter.subscribe((err: string) => this.message = err);
@@ -29,6 +31,6 @@ export class LoginComponent {
   }
 
   onLogin() {
-    this.authService.login(this.loginForm.value);
+    this.authService.login(this.loginForm.value, "/");
   }
 }

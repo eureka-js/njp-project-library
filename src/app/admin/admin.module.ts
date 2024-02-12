@@ -17,8 +17,4 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule
   ]
 })
-export class AdminModule { 
-  ngOnInit() {
-    console.log("AdminModule");
-  }
-}
+export class AdminModule { }

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -7,5 +8,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  constructor() {};
+  currPathUrl: string = "";
+
+  constructor(private router: Router) {};
+
+  ngOnInit() {
+    this.currPathUrl = this.router.url;
+  }
 };

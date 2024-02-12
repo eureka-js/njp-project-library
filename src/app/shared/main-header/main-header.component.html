@@ -1,6 +1,12 @@
 <header [ngClass]="'container'">
     <div [ngClass]="'row'">
         <h1>Library</h1>
+    </div>
+    <div [ngClass]="'row'">
+        <small>Currently logged in as: </small>
+        <small>{{username}}</small>
+    </div>
+    <div [ngClass]="'row'">
         <app-main-navbar></app-main-navbar>
     </div>
 </header>

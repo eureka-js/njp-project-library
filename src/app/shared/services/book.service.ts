@@ -19,9 +19,13 @@ export class BookService {
             this.booksSubject.next([...this.books]);
         });
     };
-
+    
 
     getBooks() {
+        return this.books;
+    };
+
+    getBooksSubject() {
         return this.booksSubject;
     };
     
