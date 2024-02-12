@@ -71,7 +71,15 @@ export class DataService {
 
     getBooks() {
         return this.httpClient.get(this.apiUrl + "/books").pipe(map((res: any) => {
-            return res.books.map((res: any) => new Book(
+            let cDate: [number, number, number];
+            let rDate: [number, number, number];
+            return res.books.map((res: any) => {
+                if (res.idCheckout) {
+                    cDate = res.checkoutDate.split('/').map(Number);
+                    rDate = res.returnDate.split('/').map(Number);    
+                }
+
+                return new Book(
                 res.id,
                 new Genre(res.idGenre, res.genreType),
                 new Author(res.idAuthor, res.name, res.surname),
@@ -79,9 +87,13 @@ export class DataService {
                 res.idCheckout ? new Checkout(
                     res.idCheckout,
                     new Membership(res.idMembership, res.idMembershipType, res.idUser),
-                    new CheckoutDate(res.idCheckoutDate, res.checkoutDate, res.returnDate)
+                    new CheckoutDate(
+                        res.idCheckoutDate,
+                        new Date(cDate[2], cDate[1] - 1, cDate[0]),
+                        new Date(rDate[2], rDate[1] - 1, rDate[0])
+                    )
                 ) : undefined
-            ));
+            )});
         }));
     }
 
@@ -93,6 +105,8 @@ export class DataService {
                 }
 
                 // Reformatting the checkout data into the object of class Checkout
+                let cDate: [number, number, number] = res.checkout.checkoutDate.split('/').map(Number);
+                let rDate: [number, number, number] = res.checkout.returnDate.split('/').map(Number);
                 res.checkout = new Checkout(
                     res.checkout.idCheckout,
                     new Membership(
@@ -102,8 +116,8 @@ export class DataService {
                     ),
                     new CheckoutDate(
                         res.checkout.idCheckoutDate,
-                        res.checkout.checkoutDate,
-                        res.checkout.returnDate
+                        new Date(cDate[2], cDate[1] - 1, cDate[0]),
+                        new Date(rDate[2], rDate[1] - 1, rDate[0])
                     )
                 );
 
@@ -126,13 +140,40 @@ export class DataService {
             if (res.status === "NOT OK") {
                 return throwError(() => new TypeError(res.description));
             }
-
             book.id = res.insertBookId;
             book.genre.id = res.insertGenreId;
             book.author.id = res.insertAuthorId;
 
             return res;
         }));
+    }
+
+    updateBook(book: Book) {
+        return this.httpClient.put(this.apiUrl + "/book/" + book.id, {
+            title: book.title,
+            genre: {
+                id: book.genre.id,
+                type: book.genre.type
+            },
+            author: {
+                id: book.author.id,
+                name: book.author.name,
+                surname: book.author.surname
+            },
+            checkout: (book.checkout ? {
+                id: book.checkout.id,
+                membership: {
+                    id: book.checkout.membership.id,
+                    idMembershipType: book.checkout.membership.idMembershipType,
+                    idUser: book.checkout.membership.idUser
+                },
+                checkoutDate: {
+                    id: book.checkout.checkoutDate.id,
+                    checkoutDate: book.checkout.checkoutDate.checkoutDate,
+                    returnDate: book.checkout.checkoutDate.returnDate
+                }
+            } : undefined)
+         }).pipe(map((res) => res));
     }
 
     delBookById(id: number) {

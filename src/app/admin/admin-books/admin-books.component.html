@@ -1,16 +1,21 @@
 <app-admin-header></app-admin-header>
 <main [ngClass]="'container'">
     <section [ngClass]="'row'">
-        <article *ngFor="let book of books" [ngClass]="'col-lg-4 col-sm-12'">
-            <p>Title: {{book.title}}</p>
-            <p>Genre: {{book.genre.type}}</p>
-            <p>Author: {{book.author.name}} {{book.author.surname}}</p>
-            <button *ngIf="!book.checkout" (click)="onRemove(book.id)" class="bad_button">Remove</button>
-            <div *ngIf="book.checkout">
-                <p>Checkout date: {{book.checkout.checkoutDate.checkoutDate}}</p>
-                <p>Return date: {{book.checkout.checkoutDate.returnDate}}</p>    
-                <button class="bad_button" disabled>Lent</button>
-            </div>
+        <article *ngFor="let book of books; let i = index" [ngClass]="'col-lg-4 col-sm-12'">
+            <i>{{message[i]}}</i><br>
+            <form [ngClass]="'col-12 admin-form'" [formGroup]="booksForm[i]">
+                <input type="text" id="title" placeholder="Title" formControlName="title"><br>
+                <input type="text" id="genre" placeholder="Genre" formControlName="genre"><br>
+                <input type="text" id="authorName" placeholder="Author's name" formControlName="authorName"><br>
+                <input type="text" id="authorSurname" placeholder="Author's surname" formControlName="authorSurname"><br>
+                <div *ngIf="book.checkout">
+                    <input type="date" id="checkoutDate" placeholder="Checkout date" formControlName="checkoutDate"><br>
+                    <input type="date" id="returnDate" placeholder="Return date" formControlName="returnDate"><br>
+                </div>    
+                <button (click)="onUpdate(i)" [disabled]="booksForm[i].errors" class="good_button">Update</button>
+                <button *ngIf="!book.checkout" (click)="onRemove(book.id)" class="bad_button">Remove</button>
+                <button *ngIf="book.checkout" class="bad_button" disabled>Lent</button>
+            </form>    
         </article>
     </section>
 </main>

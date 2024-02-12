@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Book } from "../models/book.model";
-import { BehaviorSubject, catchError, tap, throwError } from "rxjs";
+import { BehaviorSubject, catchError, map, tap, throwError } from "rxjs";
 import { DataService } from './data.service';
 
 
@@ -62,6 +62,28 @@ export class BookService {
             }
         });
     };
+
+    updateBook(book: Book) {
+        console.log(book);
+        return this.dataService.updateBook(book).pipe(map((res: any) => {
+            if (res.status === "NOT OK") {
+                return throwError(() => new TypeError(res.description));
+            }
+
+            // the new values can hold the values of the old id's.
+            // So that the logic in the api is a little bit simpler
+            book.genre.id = res.newGenreId;
+            book.author.id = res.newAuthorId;
+            if (book.checkout) {
+                book.checkout.checkoutDate.id = res.newCheckoutDateId;
+            }
+
+            this.books[this.books.findIndex(b => b.id === book.id)] = book;
+            this.booksSubject.next([...this.books]);
+
+            return res;
+        }));
+    }
 
     delBookById(id: number) {
         this.dataService.delBookById(id).subscribe((res: any) => {

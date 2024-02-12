@@ -15,6 +15,7 @@ import { AuthInterceptor } from './auth/auth.interceptor';
 import { BookService } from './shared/services/book.service';
 import { UserService } from './shared/services/user.service';
 import { UserModule } from './user/user.module';
+import { DatePipe } from '@angular/common';
 
 
 @NgModule({
@@ -28,12 +29,12 @@ import { UserModule } from './user/user.module';
     BookModule,
     AuthModule,
     RegisterModule,
-    UserModule
-],
+    UserModule],
   providers: [
     AuthService,
     UserService,
     BookService,
+    DatePipe,
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
   ],
   bootstrap: [AppComponent]

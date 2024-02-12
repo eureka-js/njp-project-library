@@ -5,8 +5,8 @@
             <p>Title: {{book.title}}</p>
             <p>Genre: {{book.genre.type}}</p>
             <p>Author: {{book.author.name}} {{book.author.surname}}</p>
-            <p>Checkout date: {{book.checkout?.checkoutDate?.checkoutDate}}</p>
-            <p>Return date: {{book.checkout?.checkoutDate?.returnDate}}</p>
+            <p>Checkout date: {{book.checkout?.checkoutDate?.checkoutDate.toISOString().split('T')[0]}}</p>
+            <p>Return date: {{book.checkout?.checkoutDate?.returnDate.toISOString().split('T')[0]}}</p>
             <button (click)="onReturn(book.id)" class="good_button">Return</button>
         </article>
     </section>

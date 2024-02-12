@@ -4,6 +4,7 @@ import { AdminBooksComponent } from './admin-books/admin-books.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminRoutingModule } from './admin-router.module';
 import { SharedModule } from '../shared/shared.module';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -14,7 +15,8 @@ import { SharedModule } from '../shared/shared.module';
   imports: [
     CommonModule,
     AdminRoutingModule,
-    SharedModule
+    SharedModule,
+    ReactiveFormsModule
   ]
 })
 export class AdminModule { }

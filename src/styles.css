@@ -19,6 +19,10 @@ form {
     border-left: 1px solid gray;
     border-right: 1px solid gray;
 }
+.admin-form {
+    border-left: 0;
+    border-right: 0;
+}
 
 input {
     background-color: gray;
