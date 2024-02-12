@@ -1,6 +1,6 @@
 <app-admin-header></app-admin-header>
 <main [ngClass]="'container'">
-    <section [ngClass]="'row'"><br>
+    <section [ngClass]="'row'">
         <article *ngFor="let user of users; let i = index" [ngClass]="'col-lg-4 col-sm-12'">
             <p>Username: {{user.username}}</p>
             <p>Name: {{user.name}}</p>

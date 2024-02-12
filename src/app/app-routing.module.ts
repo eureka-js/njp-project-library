@@ -16,7 +16,7 @@ const routes: Routes = [
   {path: 'register', loadChildren: () => RegisterModule},
   {path: 'user', loadChildren: () => UserModule, canActivate: [authGuard]},
   {path: 'admin', loadChildren: () => AdminModule, canActivate: [adminGuard]},
-  {path: '**', redirectTo: 'admin'}
+  {path: '**', redirectTo: ''}
 ];
 
 @NgModule({
