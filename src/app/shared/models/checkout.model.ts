@@ -11,5 +11,5 @@ export class Checkout {
         this.id = id;
         this.membership = membership;
         this.checkoutDate = checkoutDate;
-    };
+    }
 };

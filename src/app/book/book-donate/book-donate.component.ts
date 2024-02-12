@@ -5,6 +5,7 @@ import { Book } from 'src/app/shared/models/book.model';
 import { Genre } from 'src/app/shared/models/genre.model';
 import { BookService } from 'src/app/shared/services/book.service';
 
+
 @Component({
   selector: 'app-book-donate',
   templateUrl: './book-donate.component.html',
@@ -14,7 +15,8 @@ export class BookDonateComponent {
   message: string = "";
   donateForm!: FormGroup;
 
-  constructor(private bookService: BookService) {};
+  constructor(private bookService: BookService) {}
+
 
   ngOnInit() {
     this.donateForm = new FormGroup({
@@ -32,10 +34,14 @@ export class BookDonateComponent {
         new Genre(-1, this.donateForm.value.genreType),
         new Author(-1, this.donateForm.value.authorName, this.donateForm.value.authorSurname),
         this.donateForm.value.title
-      ));
-
-      this.message = "Successful donation";
-      this,this.donateForm.reset();
+      )).subscribe((res) => {
+        if (res.status === "NOT OK") {
+          this.message = res.description;
+        } else {
+          this.message = "Successful donation";
+          this.donateForm.reset();
+        }
+      });
     } catch (err) {
       console.log(err);
     }

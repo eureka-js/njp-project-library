@@ -2,6 +2,7 @@ import { Author } from "./author.model";
 import { Checkout } from "./checkout.model";
 import { Genre } from "./genre.model";
 
+
 export class Book {
     id: number;
     genre: Genre;

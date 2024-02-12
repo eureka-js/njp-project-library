@@ -7,5 +7,5 @@ export class Membership {
         this.id = id;
         this.idMembershipType = idMembershipType;
         this.idUser = idUser;
-    };
+    }
 };

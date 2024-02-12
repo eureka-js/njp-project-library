@@ -23,13 +23,14 @@ export class UserInfoComponent {
   userForm!: FormGroup;
   
   constructor(private authService: AuthService, private bookService: BookService
-    , private userService: UserService, private router: Router) {};
+    , private userService: UserService, private router: Router) {}
 
   ngOnInit() {
     this.user = this.authService.getUser();
 
     this.userSub = this.authService.getUserSubject().subscribe((res?: User) => {
       this.user = res;
+      
       this.userForm = new FormGroup({
         "username": new FormControl(this.user?.username
           , [Validators.required, this.isValueChangedValidator(this.user?.username)]),
@@ -72,13 +73,8 @@ export class UserInfoComponent {
         this.userForm.value.email,
         this.user!.memType,
         this.userForm.value.password || this.user!.hashedPass
-      )).subscribe((res: any) => {
-        if (res.status === "OK") {
-          this.authService.login(res.loginVals, this.router.url);
-        }
-
-        this.message = res.description;
-      });
+      )).subscribe((res: any) => res.status === "OK"
+        ? this.authService.login(res.loginVals, this.router.url) : this.message = res.description);
     }
   }
 

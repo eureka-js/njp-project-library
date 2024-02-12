@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
+
 @Component({
   selector: 'app-admin-header',
   templateUrl: './admin-header.component.html',
@@ -11,7 +12,7 @@ export class AdminHeaderComponent {
   username?: string = "";
   usernameSub!: Subscription;
 
-  constructor(private authService: AuthService) {};
+  constructor(private authService: AuthService) {}
 
   ngOnInit() {
     this.usernameSub = this.authService.getUserSubject()

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/shared/services/auth.service';
+
 
 @Component({
   selector: 'app-login',
@@ -15,7 +15,8 @@ export class LoginComponent {
   errEmmiterSub?: Subscription;
   userSub?: Subscription;
 
-  constructor(private authService: AuthService, private router: Router) {};
+  constructor(private authService: AuthService) {}
+
 
   ngOnInit() {
     this.errEmmiterSub = this.authService.errEmmitter.subscribe((err: string) => this.message = err);

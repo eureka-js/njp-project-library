@@ -15,8 +15,9 @@ export class BooksComponent {
   booksSub!: Subscription;
   lendButtText!: string;
 
-  constructor(private bookService: BookService, private authService: AuthService) {};
+  constructor(private bookService: BookService, private authService: AuthService) {}
 
+  
   ngOnInit() {
     this.booksSub = this.bookService.getBooksSubject().subscribe((res) => this.books = res);
   }

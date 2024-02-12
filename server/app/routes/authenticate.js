@@ -31,7 +31,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                                 "SELECT type FROM MembershipTypes WHERE id = ?;",
                                 [(await conn.query(
                                     "SELECT idMembershipType FROM Memberships WHERE idUser = ?;",
-                                     userList[0].id
+                                    userList[0].id
                                 ))[0].idMembershipType]
                             ))[0].type,
                             hashedPass: userList[0].password
@@ -54,7 +54,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         } else {
             next();
         }
-    });
+    })
 
     authRouter.post('/', async (req, res) => {
         let conn;
@@ -67,7 +67,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             } else if (bcrypt.compareSync(req.body.password, userList[0].password)) {
                 let idMembTypeList = await conn.query(
                     "SELECT idMembershipType FROM Memberships WHERE idUser = ?;",
-                     userList[0].id
+                    userList[0].id
                 );
                 if (idMembTypeList.length == 0) {
                     res.json({ "status": "NOT OK", "description": "Membership non existant"});
@@ -100,7 +100,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 conn.release();
             }
         }
-    });
+    })
 
     return authRouter;
 };

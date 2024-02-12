@@ -1,9 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Book } from "../models/book.model";
-import { BehaviorSubject, catchError, throwError } from "rxjs";
+import { BehaviorSubject, catchError, tap, throwError } from "rxjs";
 import { DataService } from './data.service';
-import { Checkout } from "../models/checkout.model";
-
 
 
 @Injectable({
@@ -18,24 +16,27 @@ export class BookService {
             this.books = res;
             this.booksSubject.next([...this.books]);
         });
-    };
+    }
     
 
     getBooks() {
         return this.books;
-    };
+    }
 
     getBooksSubject() {
         return this.booksSubject;
-    };
+    }
     
     addBook(book: Book) {
-        this.dataService.addBook(book)
-            .pipe(catchError((err) => { return throwError(() => new TypeError(err)) }))
-            .subscribe(() => {
+        return this.dataService.addBook(book).pipe(
+            tap((res) => {
                 this.books.push(book);
                 this.booksSubject.next([...this.books]);
-            });
+
+                return res;
+            }),
+            catchError((err) => throwError(() => new TypeError(err)))
+        );
     }
 
     lendBookById(bookId: number, userId?: number) {
@@ -73,4 +74,4 @@ export class BookService {
             }
         });
     }
-};
+}

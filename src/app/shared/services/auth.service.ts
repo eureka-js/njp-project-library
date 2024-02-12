@@ -19,31 +19,33 @@ export class AuthService {
     errEmmitter: Subject<string> = new Subject<string>();
     private authUrl: string = environment.API_URL + "/authenticate";
 
-    constructor(private http: HttpClient, private router: Router, private dataService: DataService) {};
+    constructor(private http: HttpClient, private router: Router, private dataService: DataService) {}
 
+    
     login(loginVals: { username: string, password: string }, urlPath: string) {
         this.http.post(this.authUrl, { username: loginVals.username, password: loginVals.password })
             .subscribe((res: any) => {
-                    if (res.status === "OK") {
-                        this.token = res.token;
-                        localStorage.setItem("token", this.token || "");
-                        this.user = new User(
-                            res.user.id,
-                            res.user.username,
-                            res.user.name,
-                            res.user.surname,
-                            res.user.email,
-                            res.user.memType,
-                            res.user.hashedPass
-                        );
-                        this.userSubject?.next(this.user);
-                        this.isUserAdminSubject.next(this.user.memType === "admin");
+                if (res.status === "OK") {
+                    this.token = res.token;
+                    localStorage.setItem("token", this.token || "");
 
-                        this.router.navigate([urlPath]);
-                    } else {
-                        this.errEmmitter.next(res.description);
-                    }
-                });
+                    this.user = new User(
+                        res.user.id,
+                        res.user.username,
+                        res.user.name,
+                        res.user.surname,
+                        res.user.email,
+                        res.user.memType,
+                        res.user.hashedPass
+                    );
+                    this.userSubject?.next(this.user);
+                    this.isUserAdminSubject.next(this.user.memType === "admin");
+
+                    this.router.navigate([urlPath]);
+                } else {
+                    this.errEmmitter.next(res.description);
+                }
+            });
     }
 
     updateUser(user: User) {
@@ -121,4 +123,4 @@ export class AuthService {
             return new Observable(observer => observer.next({ status: "NOT OK" }));
         }
     }
-};
+}

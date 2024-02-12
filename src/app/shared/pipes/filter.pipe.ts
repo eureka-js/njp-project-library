@@ -17,6 +17,7 @@ export class FilterPipe implements PipeTransform {
             if (el === undefined) {
                 break;
             }
+            
             el = el[field];
         }
 

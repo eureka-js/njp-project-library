@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { User } from 'src/app/shared/models/user.model';
 import { UserService } from 'src/app/shared/services/user.service';
 
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -13,7 +14,7 @@ export class RegisterComponent {
   message: string = "";
   registerForm!: FormGroup;
   
-  constructor(private userService: UserService, private router: Router) {};
+  constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit() {
     this.registerForm = new FormGroup({
@@ -48,7 +49,8 @@ export class RegisterComponent {
           } else {
             console.error(err);
           }
-      }});
+        }
+      });
     }
-  };
+  }
 }

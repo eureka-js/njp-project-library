@@ -7,5 +7,5 @@ export class CheckoutDate {
         this.id = id;
         this.checkoutDate = checkoutDate,
         this.returnDate = returnDate;
-    };
+    }
 };

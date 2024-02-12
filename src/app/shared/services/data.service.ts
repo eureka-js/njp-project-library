@@ -17,7 +17,7 @@ import { CheckoutDate } from "../models/checkout-date.model";
 export class DataService {
     private apiUrl: string = environment.API_URL + "/api";
 
-    constructor(private httpClient: HttpClient) {};
+    constructor(private httpClient: HttpClient) {}
 
 
     getUsers() {
@@ -67,7 +67,7 @@ export class DataService {
 
     delUserById(id: number) {
         return this.httpClient.delete(this.apiUrl + "/user/" + id);
-    };
+    }
 
     getBooks() {
         return this.httpClient.get(this.apiUrl + "/books").pipe(map((res: any) => {
@@ -86,31 +86,30 @@ export class DataService {
     }
 
     lendBookById(bookId: number, userId?: number) {
-        return this.httpClient.put(
-            this.apiUrl + "/bookLend", { bookId: bookId, userId: userId }
-        ).pipe(map((res: any) => {
-            if (res.status === "NOT OK") {
-                return throwError(() => new TypeError(res.description));
-            }
+        return this.httpClient.put(this.apiUrl + "/bookLend", { bookId: bookId, userId: userId } )
+            .pipe(map((res: any) => {
+                if (res.status === "NOT OK") {
+                    return throwError(() => new TypeError(res.description));
+                }
 
-            // Reformatting the checkout data into the object of class Checkout
-            res.checkout = new Checkout(
-                res.checkout.idCheckout,
-                new Membership(
-                    res.checkout.idMembership,
-                    res.checkout.idMembershipType,
-                    res.checkout.idUser
-                ),
-                new CheckoutDate(
-                    res.checkout.idCheckoutDate,
-                    res.checkout.checkoutDate,
-                    res.checkout.returnDate
-                )
-            );
+                // Reformatting the checkout data into the object of class Checkout
+                res.checkout = new Checkout(
+                    res.checkout.idCheckout,
+                    new Membership(
+                        res.checkout.idMembership,
+                        res.checkout.idMembershipType,
+                        res.checkout.idUser
+                    ),
+                    new CheckoutDate(
+                        res.checkout.idCheckoutDate,
+                        res.checkout.checkoutDate,
+                        res.checkout.returnDate
+                    )
+                );
 
-
-            return res;
-        }));
+                return res;
+            })
+        );
     }
 
     returnBookById(bookId: number) {
@@ -139,4 +138,4 @@ export class DataService {
     delBookById(id: number) {
         return this.httpClient.delete(this.apiUrl + "/book/" + id);
     }
-};
+}

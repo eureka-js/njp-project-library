@@ -5,5 +5,5 @@ export class Genre {
     constructor(id: number, type: string) {
         this.id = id;
         this.type = type;
-    };
+    }
 };

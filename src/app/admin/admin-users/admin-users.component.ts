@@ -1,11 +1,11 @@
-import { Component, inject } from '@angular/core';
-import { Route, Router } from '@angular/router';
+import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Book } from 'src/app/shared/models/book.model';
 import { User } from 'src/app/shared/models/user.model';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { BookService } from 'src/app/shared/services/book.service';
 import { UserService } from 'src/app/shared/services/user.service';
+
 
 @Component({
   selector: 'app-admin-users',
@@ -18,7 +18,9 @@ export class AdminUsersComponent {
   books: Book[] = [];
   booksSub!: Subscription;
 
-  constructor(private userService: UserService, private authService: AuthService, private bookService: BookService) {};
+  constructor(private userService: UserService, private bookService: BookService
+    , private authService: AuthService) {}
+
 
   ngOnInit() {
     this.usersSub = this.userService.getUsers().subscribe((res: User[]) => this.users = res);
@@ -35,7 +37,7 @@ export class AdminUsersComponent {
   }
 
   changeMemTypeById(id: number,  memType: string) {
-    this.userService.changeMemTypeById(id, memType).subscribe((res) => {
+    this.userService.changeMemTypeById(id, memType).subscribe(() => {
       let user = this.authService.getUser()!;
       if (id === user.id) {
         this.authService.login({ username: user.username, password: user.hashedPass }, "/");

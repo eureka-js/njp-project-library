@@ -36,4 +36,3 @@ const path = require("path");
 
      app.listen(config.port);
 })();
-

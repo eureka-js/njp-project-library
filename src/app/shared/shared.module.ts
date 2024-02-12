@@ -10,7 +10,6 @@ import { AdminNavbarComponent } from './admin-navbar/admin-navbar.component';
 import { AdminHeaderComponent } from './admin-header/admin-header.component';
 
 
-
 @NgModule({
   declarations: [
     NavbarComponent,

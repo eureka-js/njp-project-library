@@ -4,7 +4,6 @@ import { BehaviorSubject, catchError, map, throwError } from "rxjs";
 import { DataService } from './data.service';
 
 
-
 @Injectable({
     providedIn: 'root'
 })
@@ -17,12 +16,12 @@ export class UserService {
             this.users = res;
             this.usersSubject.next([...this.users]);
         });
-    };
+    }
 
 
     getUsers() {
         return this.usersSubject;
-    };
+    }
 
     addUser(user: User) {
         return this.dataService.addUser(user).pipe(
@@ -32,8 +31,9 @@ export class UserService {
                 this.usersSubject.next([...this.users]);
 
                 return res;
-            }));
-    };
+            })
+        );
+    }
 
     changeMemTypeById(id: number, memType: string) {
         return this.dataService.changeMemTypeById(id, memType).pipe(map((res: any) => {
@@ -62,4 +62,4 @@ export class UserService {
             return res;
         }));
     }
-};
+}

@@ -14,7 +14,8 @@ export class MainNavbarComponent {
   isUserAdminSub!: Subscription;
   currPathUrl: string = "";
 
-  constructor(private authService: AuthService, private router: Router) {};
+  constructor(private authService: AuthService, private router: Router) {}
+
 
   ngOnInit() {
     this.isUserAdminSub = this.authService.getIsUserAdminSubject()
@@ -30,4 +31,4 @@ export class MainNavbarComponent {
   onLogout() {
     this.authService.logout();
   }
-};
+}

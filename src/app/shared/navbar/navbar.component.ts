@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 export class NavbarComponent {
   currPathUrl: string = "";
 
-  constructor(private router: Router) {};
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.currPathUrl = this.router.url;

@@ -9,7 +9,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             res.json({
                 status: "OK",
                 users: await conn.query(
-                    `SELECT u.id, u.username, u.name, u.surname, u.email, mt.type AS memType, u.password
+                    `SELECT u.*, mt.type AS memType
                     FROM Users AS u INNER JOIN
                         Memberships AS m ON u.id = m.idUser INNER JOIN
                         MembershipTypes AS mt ON m.idMembershipType = mt.id;`
@@ -28,7 +28,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         try {
             conn = await pool.getConnection();
             
-            if ((await conn.query("SELECT id FROM Users WHERE username = ?", [req.body.username])).length > 0) {
+            if ((await conn.query("SELECT id FROM Users WHERE username = ?;", [req.body.username])).length > 0) {
                 return res.json({
                     "status": "NOT OK",
                     "description": "Username is already taken"
@@ -36,10 +36,15 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             }
 
             bcrypt.hash(req.body.password, null, null, async (err, hash) => {
-                let insertId = (await conn.query("INSERT INTO Users(username, password, name, surname, email) VALUES(?, ?, ?, ?, ?);",
-                    [req.body.username, hash, req.body.name, req.body.surname, req.body.email])).insertId;
+                let insertId = (await conn.query(
+                    "INSERT INTO Users(username, password, name, surname, email) VALUES(?, ?, ?, ?, ?);",
+                    [req.body.username, hash, req.body.name, req.body.surname, req.body.email]
+                )).insertId;
                 let memType = await conn.query("SELECT * FROM MembershipTypes WHERE type = 'basic';");
-                await conn.query("INSERT INTO Memberships(idMembershipType, idUser) VALUES(?, ?);", [memType[0].id, insertId]);
+                await conn.query(
+                    "INSERT INTO Memberships(idMembershipType, idUser) VALUES(?, ?);",
+                    [memType[0].id, insertId]
+                );
 
                 res.json({
                     "status": "OK",
@@ -55,7 +60,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 conn.release();
             }
         }
-    });
+    })
 
     apiRouter.use((req, res, next) => {
         // req.body.token || req.params.token || req.headers['x-access-token'] || req.query.token
@@ -82,12 +87,13 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 "message": "No token"
             });
         }
-    });
+    })
 
     apiRouter.route("/user/:id").delete(async (req, res) => {
         let conn;
         try {
             conn = await pool.getConnection();
+
             await conn.query("DELETE FROM Memberships WHERE idUser = ?;", [req.params.id]);
             await conn.query("DELETE FROM Users WHERE id = ?;", [req.params.id]);
 
@@ -101,12 +107,14 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             }
         }
     }).put(async (req, res) => {
-                let conn;
+        let conn;
         try {
             conn = await pool.getConnection();
 
-            let usernameAndPass = (await conn.query("SELECT username, password FROM Users WHERE id = ?;", [req.params.id]))[0];
-            console.log(usernameAndPass);
+            let usernameAndPass = (await conn.query(
+                "SELECT username, password FROM Users WHERE id = ?;",
+                [req.params.id]
+            ))[0];
             if (!usernameAndPass) {
                 return res.json({"status": "NOT OK", "description": "You were not found in the database" });
             }
@@ -114,7 +122,8 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
             if (req.body.username !== usernameAndPass.username
                 && (await conn.query("SELECT id FROM Users WHERE username = ?;", [req.body.username])).length > 0) {
                 return res.json({"status": "NOT OK", "description": "Username is already taken" });
-            } else if (bcrypt.compareSync(req.body.password, usernameAndPass.password)) {
+            } else if (req.body.password === usernameAndPass.password
+                || bcrypt.compareSync(req.body.password, usernameAndPass.password)) {
                 await conn.query(
                     `UPDATE Users
                     SET username = ?, name = ?, surname = ?, email = ?
@@ -124,7 +133,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
 
                 res.json({
                     "status" : "OK",
-                    "hashedPass": userPass
+                    "hashedPass": usernameAndPass.password
                 });
             } else {
                 bcrypt.hash(req.body.password, null, null, async (err, hash) => {
@@ -139,7 +148,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                         "status" : "OK",
                         "hashedPass": hash
                     });
-                })
+                });
             }
         } catch (err) {
             console.log(err);
@@ -149,8 +158,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 conn.release();
             }
         }
-    });
-
+    })
 
     apiRouter.route("/userMemType/:id").put(async (req, res) => {
         let conn;
@@ -259,7 +267,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 conn.release();
             }
         }
-    });
+    })
 
     apiRouter.route("/book/:id").delete(async (req, res) => {
         let conn;
@@ -290,7 +298,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 conn.release();
             }
         }
-    });
+    })
 
     apiRouter.route("/bookLend").put(async (req, res) => {
         let conn;
@@ -325,13 +333,9 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
 
             await conn.query(
                 `INSERT INTO Checkouts(idMembership, idBook, idCheckoutDate)
-                VALUES(
-                    (SELECT id FROM Memberships WHERE idUser = ? LIMIT 1),
-                    ?, ?
-                );`,
+                VALUES((SELECT id FROM Memberships WHERE idUser = ? LIMIT 1), ?, ?);`,
                 [req.body.userId, req.body.bookId, chDateInsertId[0].insertId]
             );
-
 
             res.json({
                 "status": "OK",
@@ -355,14 +359,17 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 conn.release();
             }
         }
-    });
+    })
 
     apiRouter.route("/bookCheckout/:id").delete(async (req, res) => {
         let conn;
         try {
             conn = await pool.getConnection();
 
-            let chDateId = (await conn.query("SELECT idCheckoutDate FROM Checkouts WHERE idBook = ?;", [req.params.id]))[0].idCheckoutDate;
+            let chDateId = (await conn.query(
+                "SELECT idCheckoutDate FROM Checkouts WHERE idBook = ?;",
+                [req.params.id]
+            ))[0].idCheckoutDate;
             if (chDateId) {
                 await conn.query("DELETE FROM Checkouts WHERE idBook = ?;", [req.params.id]);
                 if ((await conn.query("SELECT id FROM Checkouts WHERE idCheckoutDate = ?;",
@@ -380,7 +387,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 conn.release();
             }
         }
-    });
+    })
 
     apiRouter.get("/me", (req, res) => res.send({ "status": "OK", "user": req.decoded }));
 
