@@ -17,6 +17,7 @@ import { UserService } from './shared/services/user.service';
 import { UserModule } from './user/user.module';
 import { AuthorService } from './shared/services/author.service';
 import { DatePipe } from '@angular/common';
+import { GenreService } from './shared/services/genre.service';
 
 
 @NgModule({
@@ -35,6 +36,7 @@ import { DatePipe } from '@angular/common';
     AuthService,
     UserService,
     BookService,
+    GenreService,
     AuthorService,
     DatePipe,
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}

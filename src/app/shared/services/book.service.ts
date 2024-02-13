@@ -3,6 +3,7 @@ import { Book } from "../models/book.model";
 import { BehaviorSubject, catchError, map, tap, throwError } from "rxjs";
 import { DataService } from './data.service';
 import { Author } from "../models/author.model";
+import { Genre } from "../models/genre.model";
 
 
 @Injectable({
@@ -86,15 +87,6 @@ export class BookService {
         }));
     }
 
-    updateAuthorLocally(author: Author) {
-        let i = this.books.findIndex(b => b.author.id === author.id);
-        if (i !== -1) {
-            this.books[i].author.name = author.name;
-            this.books[i].author.surname = author.surname;
-            this.booksSubject.next([...this.books]);
-        }
-    }
-
     delBookById(id: number) {
         this.dataService.delBookById(id).subscribe((res: any) => {
             if (res.status === "OK") {
@@ -105,5 +97,22 @@ export class BookService {
                 }
             }
         });
+    }
+
+    updateGenreLocally(genre: Genre) {
+        let i = this.books.findIndex(b => b.genre.id === genre.id);
+        if (i !== -1) {
+            this.books[i].genre.type = genre.type;
+            this.booksSubject.next([...this.books]);
+        }
+    }
+
+    updateAuthorLocally(author: Author) {
+        let i = this.books.findIndex(b => b.author.id === author.id);
+        if (i !== -1) {
+            this.books[i].author.name = author.name;
+            this.books[i].author.surname = author.surname;
+            this.booksSubject.next([...this.books]);
+        }
     }
 }

@@ -180,6 +180,22 @@ export class DataService {
         return this.httpClient.delete(this.apiUrl + "/book/" + id);
     }
 
+    getGenres() {
+        return this.httpClient.get(this.apiUrl + "/genres").pipe(map((res: any) => {
+            const genres: Genre[] = [];
+            for (let key in res.genres) {
+                genres.push({id: key, ...res.genres[key as keyof typeof res.genres]} as Genre);
+            }
+
+            return genres;
+        }));
+    }
+
+    updateGenre(genre: Genre) {
+        return this.httpClient.put(this.apiUrl + "/genre/" + genre.id, { type: genre.type })
+            .pipe(map((res) => res));
+    }
+
     getAuthors() {
         return this.httpClient.get(this.apiUrl + "/authors").pipe(map((res: any) => {
             const authors: Author[] = [];
@@ -196,6 +212,5 @@ export class DataService {
             name: author.name,
             surname: author.surname
          }).pipe(map((res) => res));
-
     }
 }

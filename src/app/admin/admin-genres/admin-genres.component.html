@@ -1,1 +1,13 @@
-<p>admin-genres works!</p>
+<app-admin-header></app-admin-header>
+<main [ngClass]="'container'">
+    <section [ngClass]="'row'">
+        <article *ngFor="let genre of genres; let i = index" [ngClass]="'col-lg-4 col-sm-12'">
+            <i>{{message[i]}}</i><br>
+            <form [ngClass]="'col-12 admin-form'" [formGroup]="genresForm[i]">
+                <input type="text" id="type" placeholder="Type" formControlName="type"><br>
+                <button (click)="onUpdate(i)" [disabled]="genresForm[i].errors" class="good_button">Update</button>
+            </form>    
+        </article>
+    </section>
+</main>
+<app-footer></app-footer>

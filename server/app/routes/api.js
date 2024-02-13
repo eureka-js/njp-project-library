@@ -509,7 +509,45 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 conn.release();
             }
         }
-    })
+    });
+
+    apiRouter.route("/genres").get(async (req, res) => {
+        let conn;
+        try {
+            conn = await pool.getConnection();
+
+            res.json({
+                "status": "OK",
+                "genres": (await conn.query("SELECT * FROM Genres;"))
+            });
+        } catch (err) {
+            console.log(err);
+            res.json({ "status": "NOT OK"});
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    });
+
+    apiRouter.route("/genre/:id").put(async (req, res) => {
+        let conn;
+        try {
+            conn = await pool.getConnection();
+
+            await conn.query("UPDATE Genres SET type = ? WHERE id = ?;"
+                , [req.body.type, req.params.id]);
+
+            res.json({ "status": "OK" });
+        } catch (err) {
+            console.log(err);
+            res.json({ "status": "NOT OK"});
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    });
 
     apiRouter.route("/authors").get(async (req, res) => {
         let conn;
@@ -535,7 +573,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         try {
             conn = await pool.getConnection();
 
-            await conn.query("UPDATE Authors SET name = ?, surname = ? WHERE id = ?"
+            await conn.query("UPDATE Authors SET name = ?, surname = ? WHERE id = ?;"
                 , [req.body.name, req.body.surname, req.params.id]);
 
             res.json({ "status": "OK" });

@@ -42,13 +42,14 @@ export class AdminAuthorsComponent {
     });
   }
 
+  isValueChangedValidator(userAtr?: string) { 
+    return (control: AbstractControl) => control.value === userAtr ? { "valueMatch": true } : null;
+  }
+
   ngOnDestroy() {
     this.authorsSub.unsubscribe();
   }
 
-  isValueChangedValidator(userAtr?: string) { 
-    return (control: AbstractControl) => control.value === userAtr ? { "valueMatch": true } : null;
-  }
 
   onUpdate(i: number) {
     let newAuthor = new Author(
