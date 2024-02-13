@@ -344,7 +344,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 await conn.query("UPDATE Genres SET type = ? WHERE id = ?;"
                     , [req.body.genre.type, req.body.genre.id]);
                 
-                newGenreId.insertId = req.body.genre.id;
+                newGenreId = req.body.genre.id;
             }
             
             let newCheckoutDateId;
@@ -395,7 +395,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
 
             await conn.query("UPDATE Books SET idGenre = ?, idAuthor = ?, title = ? WHERE id = ?;"
                 , [newGenreId, newAuthorId, req.body.title, req.params.id]);
-            // The reason this is here so low in this section of code is because of subjective organizational reasons
+            // The reason this is here, so low in this section of code, is because of subjective organizational reasons
             if (delFlags.doDelOldGenre) {
                 console.log("Genre Delete");
                 await conn.query("DELETE FROM Genres WHERE id = ?;", [req.body.genre.id]);
@@ -404,7 +404,6 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                 console.log("Author Delete");
                 await conn.query("DELETE FROM Authors WHERE id = ?;", [req.body.author.id]);
             }
-
             
             res.json({
                 "status": "OK",
@@ -534,6 +533,11 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         let conn;
         try {
             conn = await pool.getConnection();
+
+            if ((await conn.query("SELECT COUNT(*) AS count FROM Genres WHERE type = ? AND id <> ?;"
+                , [req.body.type, req.params.id]))[0].count > 0) {
+                return res.json({ "status": "NOT OK", "description": "Genre type already taken"});
+            }
 
             await conn.query("UPDATE Genres SET type = ? WHERE id = ?;"
                 , [req.body.type, req.params.id]);

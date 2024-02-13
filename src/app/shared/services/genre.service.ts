@@ -24,12 +24,10 @@ export class GenreService {
 
     updateGenre(genre: Genre) {
         return this.dataService.updateGenre(genre).pipe(map((res: any) => {
-            if (res.status === "NOT OK") {
-                return throwError(() => new TypeError(res.description));
+            if (res.status === "OK") {
+                this.genres[this.genres.findIndex(g => g.id === genre.id)] = genre;
+                this.genresSubject.next([...this.genres]);
             }
-
-            this.genres[this.genres.findIndex(g => g.id === genre.id)] = genre;
-            this.genresSubject.next([...this.genres]);
 
             return res;
         }));

@@ -73,8 +73,13 @@ export class UserInfoComponent {
         this.userForm.value.email,
         this.user!.memType,
         this.userForm.value.password || this.user!.hashedPass
-      )).subscribe((res: any) => res.status === "OK"
-        ? this.authService.login(res.loginVals, this.router.url) : this.message = res.description);
+      )).subscribe((res: any) => {
+        if (res.status === "OK") {
+          this.authService.login(res.loginVals, this.router.url);
+        }
+        
+        this.message = res.description;
+      });
     }
   }
 

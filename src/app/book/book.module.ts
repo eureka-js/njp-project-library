@@ -7,11 +7,13 @@ import { BookDonateComponent } from './book-donate/book-donate.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BooksBorrowedComponent } from './books-borrowed/books-borrowed.component';
 import { FilterPipe } from '../shared/pipes/filter.pipe';
+import { BookDetailsComponent } from './book-details/book-details.component';
 
 
 @NgModule({
   declarations: [
     BooksComponent,
+    BookDetailsComponent,
     BookDonateComponent,
     BooksBorrowedComponent,
     FilterPipe

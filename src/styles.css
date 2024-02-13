@@ -73,14 +73,28 @@ button:focus {
     background-color: rgb(128, 0, 0);
 }
 .bad_button:focus:not(:disabled)  {
-    background-color: rgb(161, 0, 0);
+    background-color: rgb(141, 0, 0);
 }
 .bad_button:hover:not(:disabled)  {
     background-color: rgb(161, 0, 0);
 }
 .bad_button:active:not(:disabled) {
-    background-color: rgba(116, 0, 0);
+    background-color: rgb(187, 0, 0);
 }
+.neutral_button {
+    background-color: rgb(0, 53, 133);
+    color: gray;
+}
+.neutral_button:focus:not(:disabled)  {
+    background-color: rgb(0, 63, 156);
+}
+.neutral_button:hover:not(:disabled)  {
+    background-color: rgb(0, 71, 177);
+}
+.neutral_button:active:not(:disabled) {
+    background-color: rgb(0, 81, 202);
+}
+
 
 a {
     color: gray;

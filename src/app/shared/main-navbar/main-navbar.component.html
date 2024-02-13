@@ -2,9 +2,9 @@
     <div [ngClass]="'row'">
         <div [ngClass]="'col-12'">
             <a [ngClass]="currPathUrl === '/' ? 'currUrlA' : ''" [routerLink]="['/']">Catalogue</a>
-            <a [ngClass]="currPathUrl === '/books-borrowed' ? 'currUrlA' : ''" [routerLink]="['/books-borrowed']">Borrowed books</a>
+            <a [ngClass]="currPathUrl === '/books-borrowed' ? 'currUrlA' : ''" [routerLink]="['/books-borrowed']">Borrowed</a>
             <a [ngClass]="currPathUrl === '/donate' ? 'currUrlA' : ''" [routerLink]="['/donate']">Donate</a>
-            <a [ngClass]="currPathUrl === '/user' ? 'currUrlA' : ''" [routerLink]="['/user']">User info</a>
+            <a [ngClass]="currPathUrl === '/user' ? 'currUrlA' : ''" [routerLink]="['/user']">User</a>
             <a *ngIf="isUserAdmin" [routerLink]="['/admin']">Admin</a>
             <a href="#" (click)="onLogout()">Logout</a>
         </div>

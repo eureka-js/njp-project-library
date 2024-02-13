@@ -1,14 +1,14 @@
 <app-main-header></app-main-header>
 <main [ngClass]="'container'">
     <section [ngClass]="'row'">
-        <article *ngFor="let book of books" [ngClass]="'col-lg-4 col-sm-12'">
+        <article *ngIf="book" [ngClass]="'col-4'">
             <p>Title: {{book.title}}</p>
             <p>Genre: {{book.genre.type}}</p>
             <p>Author: {{book.author.name}} {{book.author.surname}}</p>
             <button *ngIf="book.checkout" disabled class="good_button">Lent</button>
             <button *ngIf="!book.checkout" (click)="onLend(book.id)" class="good_button">Lend</button>
-            <button [ngClass]="'neutral_button'" [routerLink]="['book-details', book.title]">Details</button>
         </article>
+        <span *ngIf="!book">Book not found</span>
     </section>
 </main>
 <app-footer></app-footer>

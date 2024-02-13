@@ -100,18 +100,24 @@ export class BookService {
     }
 
     updateGenreLocally(genre: Genre) {
-        let i = this.books.findIndex(b => b.genre.id === genre.id);
-        if (i !== -1) {
-            this.books[i].genre.type = genre.type;
+        if (this.books.some(b => b.genre.id === genre.id)) {
+            this.books.forEach(b => {
+                if (b.genre.id === genre.id) {
+                    b.genre.type = genre.type;
+                }
+            })
             this.booksSubject.next([...this.books]);
         }
     }
 
     updateAuthorLocally(author: Author) {
-        let i = this.books.findIndex(b => b.author.id === author.id);
-        if (i !== -1) {
-            this.books[i].author.name = author.name;
-            this.books[i].author.surname = author.surname;
+        if (this.books.some(b => b.author.id === author.id)) {
+            this.books.forEach(b => {
+                if (b.author.id === author.id) {
+                    b.author.name = author.name;
+                    b.author.surname = author.surname;
+                }
+            })
             this.booksSubject.next([...this.books]);
         }
     }
