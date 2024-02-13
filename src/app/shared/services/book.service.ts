@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Book } from "../models/book.model";
 import { BehaviorSubject, catchError, map, tap, throwError } from "rxjs";
 import { DataService } from './data.service';
+import { Author } from "../models/author.model";
 
 
 @Injectable({
@@ -83,6 +84,15 @@ export class BookService {
 
             return res;
         }));
+    }
+
+    updateAuthorLocally(author: Author) {
+        let i = this.books.findIndex(b => b.author.id === author.id);
+        if (i !== -1) {
+            this.books[i].author.name = author.name;
+            this.books[i].author.surname = author.surname;
+            this.booksSubject.next([...this.books]);
+        }
     }
 
     delBookById(id: number) {

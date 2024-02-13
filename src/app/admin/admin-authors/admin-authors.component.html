@@ -1,0 +1,14 @@
+<app-admin-header></app-admin-header>
+<main [ngClass]="'container'">
+    <section [ngClass]="'row'">
+        <article *ngFor="let author of authors; let i = index" [ngClass]="'col-lg-4 col-sm-12'">
+            <i>{{message[i]}}</i><br>
+            <form [ngClass]="'col-12 admin-form'" [formGroup]="authorsForm[i]">
+                <input type="text" id="name" placeholder="Name" formControlName="name"><br>
+                <input type="text" id="surname" placeholder="Surname" formControlName="surname"><br>
+                <button (click)="onUpdate(i)" [disabled]="authorsForm[i].errors" class="good_button">Update</button>
+            </form>    
+        </article>
+    </section>
+</main>
+<app-footer></app-footer>

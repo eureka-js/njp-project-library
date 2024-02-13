@@ -511,6 +511,44 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
         }
     })
 
+    apiRouter.route("/authors").get(async (req, res) => {
+        let conn;
+        try {
+            conn = await pool.getConnection();
+
+            res.json({
+                "status": "OK",
+                "authors": (await conn.query("SELECT * FROM Authors;"))
+            });
+        } catch (err) {
+            console.log(err);
+            res.json({ "status": "NOT OK"});
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    });
+
+    apiRouter.route("/author/:id").put(async (req, res) => {
+        let conn;
+        try {
+            conn = await pool.getConnection();
+
+            await conn.query("UPDATE Authors SET name = ?, surname = ? WHERE id = ?"
+                , [req.body.name, req.body.surname, req.params.id]);
+
+            res.json({ "status": "OK" });
+        } catch (err) {
+            console.log(err);
+            res.json({ "status": "NOT OK"});
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    });
+
     apiRouter.get("/me", (req, res) => res.send({ "status": "OK", "user": req.decoded }));
 
     return apiRouter;

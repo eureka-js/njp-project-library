@@ -179,4 +179,23 @@ export class DataService {
     delBookById(id: number) {
         return this.httpClient.delete(this.apiUrl + "/book/" + id);
     }
+
+    getAuthors() {
+        return this.httpClient.get(this.apiUrl + "/authors").pipe(map((res: any) => {
+            const authors: Author[] = [];
+            for (let key in res.authors) {
+                authors.push({id: key, ...res.authors[key as keyof typeof res.authors]} as Author);
+            }
+
+            return authors;
+        }));
+    }
+
+    updateAuthor(author: Author) {
+        return this.httpClient.put(this.apiUrl + "/author/" + author.id, {
+            name: author.name,
+            surname: author.surname
+         }).pipe(map((res) => res));
+
+    }
 }

@@ -2,6 +2,7 @@
     <div [ngClass]="'row'">
         <div [ngClass]="'col-12'">
             <a [ngClass]="currPathUrl === '/admin' ? 'currUrlA' : ''" [routerLink]="['/admin']">Books</a>
+            <a [ngClass]="currPathUrl === '/admin/admin-authors' ? 'currUrlA' : ''" [routerLink]="['/admin/admin-authors']">Authors</a>
             <a [ngClass]="currPathUrl === '/admin/admin-users' ? 'currUrlA' : ''" [routerLink]="['/admin/admin-users']">Users</a>
             <a [routerLink]="['']">Back</a>
         </div>
