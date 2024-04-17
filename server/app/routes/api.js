@@ -51,7 +51,7 @@ module.exports = (express, pool, jwt, secret, bcrypt) => {
                     "insertId": insertId,
                     "memType": memType[0].type
                 });
-            }); 
+            });
         } catch (err) {
             console.log(err);
             res.json({ "status": "NOT OK" });

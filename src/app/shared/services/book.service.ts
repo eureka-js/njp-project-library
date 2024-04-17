@@ -100,23 +100,19 @@ export class BookService {
     }
 
     updateGenreLocally(genre: Genre) {
-        if (this.books.some(b => b.genre.id === genre.id)) {
-            this.books.forEach(b => {
-                if (b.genre.id === genre.id) {
-                    b.genre.type = genre.type;
-                }
-            })
+        const booksWAimedGenre: Array<Book> = this.books.filter(b => b.genre.id === genre.id);
+        if (booksWAimedGenre.length > 0) {
+            booksWAimedGenre.forEach(b => b.genre.type = genre.type)
             this.booksSubject.next([...this.books]);
         }
     }
 
     updateAuthorLocally(author: Author) {
-        if (this.books.some(b => b.author.id === author.id)) {
-            this.books.forEach(b => {
-                if (b.author.id === author.id) {
-                    b.author.name = author.name;
-                    b.author.surname = author.surname;
-                }
+        const booksWAimedAuthor: Array<Book> = this.books.filter(b => b.author.id === author.id);
+        if (booksWAimedAuthor.length > 0) {
+            booksWAimedAuthor.forEach(b => {
+                b.author.name = author.name;
+                b.author.surname = author.surname;
             })
             this.booksSubject.next([...this.books]);
         }
